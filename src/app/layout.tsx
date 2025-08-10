@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "./core/ui/elements/Toaster";
 import TansTackProvider from "./core/ui/components/TanStackProvider";
 import Script from "next/script";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,6 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <TansTackProvider>
+      <ClerkProvider>
     <html lang="en">
 
       
@@ -81,6 +83,7 @@ export default function RootLayout({
           />
       </body>
     </html>
+    </ClerkProvider>
     </TansTackProvider>
   );
 }

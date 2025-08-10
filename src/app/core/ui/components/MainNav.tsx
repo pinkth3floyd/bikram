@@ -21,10 +21,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
-  { name: 'About', href: '/' },
-  // { name: 'Subscription', href: '/' },
-  // { name: 'Privacy', href: '/' },
-  // { name: 'Contact', href: '/' }
+  { name: 'About', href: '/about' },
+  // { name: 'Subscription', href: '/subscription' }, 
+  { name: 'Privacy', href: '/privacy' },
+  { name: 'Contact', href: '/contact' }
 
 ];
 
