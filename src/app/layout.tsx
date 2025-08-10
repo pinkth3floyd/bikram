@@ -35,6 +35,7 @@ export default function RootLayout({
       >
 
          <Toaster />
+         {/* <Analytics /> */}
         {children}
 
         <Script

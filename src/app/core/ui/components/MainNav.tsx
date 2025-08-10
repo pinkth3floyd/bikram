@@ -22,9 +22,9 @@ interface NavItem {
 const navItems: NavItem[] = [
   { name: 'Home', href: '/' },
   { name: 'About', href: '/' },
-  { name: 'Subscription', href: '/' },
-  { name: 'Privacy', href: '/' },
-  { name: 'Contact', href: '/' }
+  // { name: 'Subscription', href: '/' },
+  // { name: 'Privacy', href: '/' },
+  // { name: 'Contact', href: '/' }
 
 ];
 
