@@ -28,6 +28,7 @@ const navItems: NavItem[] = [
 
 ];
 
+
 export default function MainNav({ navClass, navJustify }: MainNavProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
