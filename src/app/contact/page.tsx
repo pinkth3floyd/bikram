@@ -21,6 +21,7 @@ import {
   FileText,
   Zap
 } from 'lucide-react'
+import Footer from '../core/ui/components/Footer'
 
 const ContactPage = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -460,6 +461,7 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
+      <Footer/>
     </div>
   )
 }

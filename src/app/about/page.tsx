@@ -24,6 +24,7 @@ import {
   FileText,
   Globe2
 } from 'lucide-react'
+import Footer from '../core/ui/components/Footer'
 
 const AboutPage = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -382,6 +383,7 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
+      <Footer/>
     </div>
   )
 }

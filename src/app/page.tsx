@@ -22,6 +22,7 @@ import {
   Globe2,
   Play
 } from 'lucide-react'
+import Footer from './core/ui/components/Footer'
 
 const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -394,6 +395,7 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+      <Footer/>
     </div>
   )
 }

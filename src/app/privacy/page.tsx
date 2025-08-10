@@ -15,6 +15,7 @@ import {
   Download,
   MessageCircle
 } from 'lucide-react'
+import Footer from '../core/ui/components/Footer'
 
 const PrivacyPage = () => {
   const [isVisible, setIsVisible] = useState(false)
@@ -294,6 +295,7 @@ const PrivacyPage = () => {
           </div>
         </div>
       </section>
+            <Footer/>
     </div>
   )
 }
