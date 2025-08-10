@@ -20,6 +20,8 @@ export * from './hooks/useUser'
 
 // Component exports
 export { UserProfile } from './components/UserProfile'
+export { CustomSignUp } from './components/CustomSignUp'
+export { CustomSignIn } from './components/CustomSignIn'
 
 // Type exports
 export type {

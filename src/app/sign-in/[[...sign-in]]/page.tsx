@@ -1,8 +1,8 @@
-import { SignIn } from '@clerk/nextjs'
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../core/ui/elements/Card'
 import { Shield, Users, Heart, Zap } from 'lucide-react'
 import MainNav from '@/app/core/ui/components/MainNav'
+import { CustomSignIn } from '@/modules/user/components/CustomSignIn'
 
 const SignInPage = () => {
   return (
@@ -121,21 +121,7 @@ const SignInPage = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <SignIn 
-                appearance={{
-                  elements: {
-                    formButtonPrimary: "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl",
-                    card: "bg-transparent shadow-none",
-                    headerTitle: "text-2xl font-bold text-gray-800 dark:text-gray-200",
-                    headerSubtitle: "text-gray-600 dark:text-gray-400",
-                    socialButtonsBlockButton: "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors",
-                    formFieldInput: "bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-purple-500",
-                    footerActionLink: "text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300",
-                    dividerLine: "bg-gray-200 dark:bg-gray-600",
-                    dividerText: "text-gray-500 dark:text-gray-400"
-                  }
-                }}
-              />
+              <CustomSignIn />
             </CardContent>
           </Card>
         </div>
