@@ -1,35 +1,28 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../core/ui/elements/Card'
+import { Card, CardContent } from '../core/ui/elements/Card'
 import { Button } from '../core/ui/elements/Button'
 import MainNav from '@/app/core/ui/components/MainNav'
 import { 
   Shield, 
   Users, 
   Heart, 
-  Zap, 
   Star, 
   Lock, 
   Globe, 
   Sparkles, 
   ArrowRight, 
   CheckCircle, 
-  Award,
-  TrendingUp,
   Eye,
   Key,
   Database,
-  UserCheck,
   MessageCircle,
   Camera,
   Video,
   Music,
   FileText,
-  Globe2,
-  Smartphone,
-  Monitor,
-  Tablet
+  Globe2
 } from 'lucide-react'
 
 const AboutPage = () => {
@@ -128,7 +121,7 @@ const AboutPage = () => {
               About Socially
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-              We're revolutionizing social media by putting users first. 
+              We&apos;re revolutionizing social media by putting users first. 
               Your data, your control, your digital freedom.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
@@ -215,7 +208,7 @@ const AboutPage = () => {
                     Democratizing Social Media
                   </h3>
                   <p className="text-lg text-gray-600 dark:text-gray-400">
-                    We're building a social platform where users have complete control over their data, 
+                    We&apos;re building a social platform where users have complete control over their data, 
                     content, and digital identity. No more algorithmic manipulation, no more data mining, 
                     no more privacy violations.
                   </p>

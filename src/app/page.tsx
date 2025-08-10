@@ -1,6 +1,6 @@
 // import Image from "next/image";
 
-import Footer from "./core/ui/components/Footer";
+
 import MainNav from "./core/ui/components/MainNav";
 
 export default function Home() {

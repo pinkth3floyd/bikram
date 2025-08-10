@@ -18,14 +18,6 @@ import {
   Shield, 
   Heart,
   ArrowRight,
-  CheckCircle,
-  Star,
-  Globe,
-  Smartphone,
-  Monitor,
-  Tablet,
-  Mail as MailIcon,
-  MessageSquare,
   FileText,
   Zap
 } from 'lucide-react'
@@ -156,7 +148,7 @@ const ContactPage = () => {
               Get in Touch
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
-              We'd love to hear from you. Reach out to us for support, feedback, or just to say hello!
+              We&apos;d love to hear from you. Reach out to us for support, feedback, or just to say hello!
             </p>
           </div>
         </div>
@@ -240,7 +232,7 @@ const ContactPage = () => {
                   <CardHeader className="text-center pb-4">
                     <CardTitle className="text-3xl">Send us a Message</CardTitle>
                     <CardDescription>
-                      We'll get back to you within 24 hours
+                      We&apos;ll get back to you within 24 hours
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="p-6">
@@ -279,7 +271,7 @@ const ContactPage = () => {
                           name="subject"
                           value={formData.subject}
                           onChange={handleInputChange}
-                          placeholder="What's this about?"
+                          placeholder="What&apos;s this about?"
                           className="bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 focus:border-purple-500 focus:ring-purple-500"
                           required
                         />
@@ -312,7 +304,7 @@ const ContactPage = () => {
                 <div className="space-y-8">
                   <div>
                     <h3 className="text-3xl font-bold text-gray-800 dark:text-gray-200 mb-6">
-                      Let's Connect
+                      Let&apos;s Connect
                     </h3>
                     <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
                       Whether you have a question about features, pricing, or anything else, our team is ready to answer all your questions.

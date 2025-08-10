@@ -1,7 +1,7 @@
 import { SignUp } from '@clerk/nextjs'
 import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../core/ui/elements/Card'
-import { Shield, Users, Heart, Zap, Star, Lock, Globe, Sparkles } from 'lucide-react'
+import { Heart, Star, Lock, Globe, Sparkles } from 'lucide-react'
 import MainNav from '@/app/core/ui/components/MainNav'
 
 const SignUpPage = () => {
@@ -146,7 +146,7 @@ const SignUpPage = () => {
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Join 10,000+ users who trust us</span>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-              "Finally, a social network that respects my privacy and gives me control over my data!" - Sarah M.
+              &quot;Finally, a social network that respects my privacy and gives me control over my data!&quot; - Sarah M.
             </p>
           </div>
         </div>

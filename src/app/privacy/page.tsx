@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../core/ui/elements/Card'
+import { Card, CardContent } from '../core/ui/elements/Card'
 import { Button } from '../core/ui/elements/Button'
 import MainNav from '@/app/core/ui/components/MainNav'
 import { 
@@ -9,8 +9,6 @@ import {
   Lock, 
   Eye, 
   Key, 
-  Database, 
-  Users, 
   CheckCircle, 
   XCircle, 
   ArrowRight,
@@ -42,7 +40,7 @@ const PrivacyPage = () => {
     {
       icon: Eye,
       title: 'Transparency',
-      description: 'We\'re completely transparent about how we handle your data.',
+      description: 'We&apos;re completely transparent about how we handle your data.',
       color: 'from-purple-500 to-pink-500'
     },
     {
@@ -162,7 +160,7 @@ const PrivacyPage = () => {
                     Your Privacy Matters
                   </h3>
                   <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                    At Socially, we believe privacy is a fundamental human right. We've built our platform 
+                    At Socially, we believe privacy is a fundamental human right. We&apos;ve built our platform 
                     from the ground up with privacy-first principles, ensuring you have complete control 
                     over your data and digital identity.
                   </p>
