@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../..
 import { Shield, Users, Heart, Zap } from 'lucide-react'
 import MainNav from '@/app/core/ui/components/MainNav'
 import { CustomSignIn } from '@/modules/user/components/CustomSignIn'
+import { SignIn } from '@clerk/nextjs'
 
 const SignInPage = () => {
   return (
@@ -115,13 +116,13 @@ const SignInPage = () => {
         <div className="flex justify-center">
           <Card className="w-full max-w-md border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-2xl">
             <CardHeader className="text-center pb-2">
-              <CardTitle className="text-2xl">Sign In</CardTitle>
+              <CardTitle className="text-2xl"></CardTitle>
               <CardDescription>
                 Welcome back to your social space
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <CustomSignIn />
+            <SignIn />
             </CardContent>
           </Card>
         </div>
