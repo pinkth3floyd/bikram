@@ -140,8 +140,8 @@ export default function MainNav({ navClass, navJustify }: MainNavProps) {
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
               <span className="text-xl font-bold">
-                <span className="text-blue-500">Soc</span>
-                <span className="text-green-500">ially</span>
+                <span className="text-blue-500">Chatt</span>
+                <span className="text-green-500">Rade</span>
                 {/* <span className="text-yellow-500">Plus</span> */}
               </span>
             </Link>

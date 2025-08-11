@@ -119,7 +119,7 @@ const AboutPage = () => {
               </div>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
-              About Socially
+              About ChattRade
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto mb-8">
               We&apos;re revolutionizing social media by putting users first. 

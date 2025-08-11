@@ -166,7 +166,7 @@ const HomePage = () => {
               </div>
             </div>
             <h1 className="text-6xl md:text-8xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-6">
-              Welcome to Socially
+              Welcome to ChattRade
             </h1>
             <p className="text-2xl md:text-3xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-8">
               The social network where you own your data, control your experience, and build authentic connections.

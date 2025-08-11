@@ -7,7 +7,7 @@ export default function Footer(){
            <div className="container-fluid">
                 <div className="grid grid-cols-1">
                    <div className="sm:text-center text-center mx-md-2 items-center justify-center">
-                       <p className="mb-0 text-slate-400">© {(new Date().getFullYear())} Socially.  Design & Developed by Socially</p>
+                       <p className="mb-0 text-slate-400">© {(new Date().getFullYear())} ChattRade.  Design & Developed by ChattRade</p>
                    </div>
                 </div>
                
