@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Socially",
-  description: "Social Media",
+  title: "ChattRade",
+  description: "ChattRade",
 };
 
 export default function RootLayout({
