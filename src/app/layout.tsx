@@ -54,6 +54,12 @@ export default function RootLayout({
             }}
           />
 
+        {/* FaceIO Script */}
+        <Script
+          src="https://cdn.faceio.net/fio.js"
+          strategy="afterInteractive"
+        />
+
         <noscript>
             <iframe
               src="https://www.googletagmanager.com/ns.html?id=G-17F2SJDKR2"

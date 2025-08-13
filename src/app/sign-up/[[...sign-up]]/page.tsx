@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../core/ui/elements/Card'
 import { Heart, Star, Lock, Globe, Sparkles } from 'lucide-react'
 import MainNav from '@/app/core/ui/components/MainNav'
-import { CustomSignUp } from '@/modules/user/components/CustomSignUp'
+// import { CustomSignUp } from '@/modules/user/components/CustomSignUp'
 import { SignUp } from '@clerk/nextjs'
 
 const SignUpPage = () => {

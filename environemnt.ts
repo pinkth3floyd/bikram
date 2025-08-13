@@ -9,7 +9,7 @@ declare namespace NodeJS {
       NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL:string;
       NEXT_PUBLIC_CLERK_SIGN_UP_URL:string;
       NEXT_PUBLIC_CLERK_SIGN_IN_URL:string;
-      FACE_IO_KEY:string;
+      NEXT_PUBLIC_FACE_IO_APP_ID:string;
     }
   }
   

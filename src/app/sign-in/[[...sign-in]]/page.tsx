@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../core/ui/elements/Card'
 import { Shield, Users, Heart, Zap } from 'lucide-react'
 import MainNav from '@/app/core/ui/components/MainNav'
-import { CustomSignIn } from '@/modules/user/components/CustomSignIn'
+// import { CustomSignIn } from '@/modules/user/components/CustomSignIn'
 import { SignIn } from '@clerk/nextjs'
 
 const SignInPage = () => {

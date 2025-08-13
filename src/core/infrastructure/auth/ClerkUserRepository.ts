@@ -66,7 +66,9 @@ export class ClerkUserRepository implements UserRepository {
           identityVerified: false,
           kycCompleted: false,
           verificationDocuments: [],
-          verificationStatus: 'pending' as const
+          verificationStatus: 'pending' as const,
+          faceVerified: false,
+          faceVerificationEnabled: false
         },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),

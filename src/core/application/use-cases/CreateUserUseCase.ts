@@ -91,7 +91,9 @@ export class CreateUserUseCase {
       identityVerified: false,
       kycCompleted: false,
       verificationDocuments: [],
-      verificationStatus: 'pending' as const
+      verificationStatus: 'pending' as const,
+      faceVerified: false,
+      faceVerificationEnabled: false
     }
 
     const now = new Date()

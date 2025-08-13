@@ -26,7 +26,7 @@ import Footer from './core/ui/components/Footer'
 
 const HomePage = () => {
   const [isVisible, setIsVisible] = useState(false)
-  const [activeFeature, setActiveFeature] = useState(0)
+  const [, setActiveFeature] = useState(0)
 
   useEffect(() => {
     setIsVisible(true)

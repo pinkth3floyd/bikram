@@ -43,6 +43,10 @@ export interface UserVerification {
   verificationDocuments?: string[]
   verificationStatus: 'pending' | 'approved' | 'rejected'
   verificationDate?: Date
+  faceVerified: boolean
+  faceId?: string
+  faceEnrollmentDate?: Date
+  faceVerificationEnabled: boolean
 }
 
 export interface UserMetadata {
@@ -295,7 +299,9 @@ export class User {
       identityVerified: false,
       kycCompleted: false,
       verificationDocuments: [],
-      verificationStatus: 'pending'
+      verificationStatus: 'pending',
+      faceVerified: false,
+      faceVerificationEnabled: false
     }
   }
 } 
