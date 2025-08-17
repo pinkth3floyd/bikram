@@ -27,6 +27,8 @@ const OnboardingPage = () => {
     checkFaceVerificationStatus()
   }, [])
 
+
+  // debugger;
   const checkFaceVerificationStatus = async () => {
     try {
       const response = await fetch('/api/face-verification')
@@ -73,30 +75,30 @@ const OnboardingPage = () => {
     )
   }
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="p-8 max-w-md">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
-            <p className="text-gray-600 mb-4">Please sign in to complete onboarding.</p>
-            <Button onClick={() => router.push('/sign-in')}>
-              Sign In
-            </Button>
-          </div>
-        </Card>
-      </div>
-    )
-  }
+  // if (!user) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <Card className="p-8 max-w-md">
+  //         <div className="text-center">
+  //           <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
+  //           <p className="text-gray-600 mb-4">Please sign in to complete onboarding.</p>
+  //           <Button onClick={() => router.push('/sign-in')}>
+  //             Sign In
+  //           </Button>
+  //         </div>
+  //       </Card>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       {/* FaceIO Script Loader */}
-      <FaceIOScriptLoader 
+      {/* <FaceIOScriptLoader 
         appId={process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'demo_app_id'}
         onLoad={() => console.log('FaceIO script loaded in onboarding')}
         onError={(error) => console.error('FaceIO script error in onboarding:', error)}
-      />
+      /> */}
       
       <div className="max-w-2xl mx-auto">
         {/* Progress indicator */}
@@ -136,7 +138,7 @@ const OnboardingPage = () => {
               </div>
               
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Welcome to Socially, {user.getProfile().displayName || user.getUsername()}!
+                {/* Welcome to Socially, {user.getProfile().displayName || user.getUsername()}! */}
               </h1>
               
               <p className="text-lg text-gray-600 mb-8">
@@ -171,7 +173,7 @@ const OnboardingPage = () => {
                 <Button 
                   onClick={() => setCurrentStep('face-enrollment')}
                   size="lg"
-                  className="flex-1"
+                  className="flex-1 text-white bg-blue-600 hover:bg-blue-700"
                 >
                   Get Started
                 </Button>

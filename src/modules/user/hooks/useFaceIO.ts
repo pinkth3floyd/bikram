@@ -8,7 +8,7 @@ import { userKeys } from './useUser'
 
 // Initialize FaceIO service only on client side
 const faceIOService = typeof window !== 'undefined' 
-  ? new FaceIOService(process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'demo_app_id')
+  ? new FaceIOService('fioae5c6')
   : null
 
 export const useFaceIO = () => {
