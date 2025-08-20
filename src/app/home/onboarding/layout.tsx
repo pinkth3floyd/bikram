@@ -1,5 +1,4 @@
 import React from 'react'
-// @ts-ignore
 
 
 const OnboardingLayout = ({ children }: { children: React.ReactNode }) => {

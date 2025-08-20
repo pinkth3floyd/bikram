@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-// @ts-ignore
+// @ts-expect-error - FaceIO types not available
 import faceIO from '@faceio/fiojs';
 
 const FACEIO_ERROR_CODES: Record<string, string> = {
@@ -60,7 +60,7 @@ const FACEIO_ERROR_CODES: Record<string, string> = {
 const OnboardingPage = () => {
     const faceiokey = process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'fioa3268';
     const { user } = useUser();
-    const faceioRef = useRef<any | null>(null);
+    const faceioRef = useRef<typeof faceIO | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [enrollmentResult, setEnrollmentResult] = useState<string | null>(null);
@@ -128,17 +128,17 @@ const OnboardingPage = () => {
             // Here you would typically update the user's metadata in your backend
             // to mark that face enrollment is complete
             
-        } catch (errCode: any) {
+        } catch (errCode: unknown) {
             console.error('Enrollment error:', errCode);
-            const errorMessage = getErrorMessage(errCode);
+            const errorMessage = getErrorMessage(String(errCode));
             setError(`Enrollment failed: ${errorMessage}`);
-            handleError(errCode);
+            handleError(String(errCode));
         } finally {
             setIsEnrolling(false);
         }
     }
 
-    function handleError(errCode: any) {
+    function handleError(errCode: string) {
         if (!faceioRef.current) return;
         
         const fioErrs = faceioRef.current.fetchAllErrorCodes();
@@ -211,11 +211,11 @@ const OnboardingPage = () => {
             setVerificationResult(`Face verification successful! Confidence: ${userInfo.confidence}%`);
             setVerificationSuccess(true);
             
-        } catch (errCode: any) {
+        } catch (errCode: unknown) {
             console.error('Verification error:', errCode);
-            const errorMessage = getErrorMessage(errCode);
+            const errorMessage = getErrorMessage(String(errCode));
             setError(`Verification failed: ${errorMessage}`);
-            handleError(errCode);
+            handleError(String(errCode));
         } finally {
             setIsVerifying(false);
         }
@@ -359,7 +359,7 @@ const OnboardingPage = () => {
                 <div className='mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
                     <h3 className='font-semibold text-yellow-800 mb-2'>Important Instructions:</h3>
                     <ul className='text-sm text-yellow-700 space-y-1 text-left'>
-                        <li>• Ensure you're in a well-lit environment</li>
+                        <li>• Ensure you&apos;re in a well-lit environment</li>
                         <li>• Position your face clearly in the camera view</li>
                         <li>• Remove glasses, hats, or other accessories during enrollment</li>
                         <li>• Look directly at the camera and follow the prompts</li>
