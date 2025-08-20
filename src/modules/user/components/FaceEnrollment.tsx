@@ -16,6 +16,7 @@ interface FaceEnrollmentProps {
   onError?: (error: string) => void;
   onProceedToVerification?: () => void;
   showVerification?: boolean;
+  verificationOnly?: boolean; // New prop to show only verification
   className?: string;
 }
 
@@ -78,6 +79,7 @@ export const FaceEnrollment: React.FC<FaceEnrollmentProps> = ({
   onError,
   onProceedToVerification,
   showVerification = false,
+  verificationOnly = false,
   className = ''
 }) => {
   const { user } = useUser();
@@ -293,51 +295,8 @@ export const FaceEnrollment: React.FC<FaceEnrollmentProps> = ({
 
   return (
     <div className={`space-y-4 ${className}`}>
-      {/* Enrollment Section */}
-      {!faceVerificationEnabled ? (
-        <div className='text-center'>
-          <h3 className='text-lg font-semibold mb-2'>Face Enrollment</h3>
-          <p className='text-gray-600 mb-4 text-sm'>
-            Enroll your face to enable secure authentication.
-          </p>
-          {isAlreadyEnrolled && (
-            <div className='bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4'>
-              <p className='text-sm'>
-                <strong>Note:</strong> It appears you may already be enrolled. If enrollment fails, you can proceed to verification.
-              </p>
-            </div>
-          )}
-          <button 
-            onClick={enrollNewUser}
-            disabled={enrollmentMutation.isPending}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              enrollmentMutation.isPending
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-            }`}
-          >
-            {enrollmentMutation.isPending ? (
-              <div className='flex items-center'>
-                <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
-                Enrolling...
-              </div>
-            ) : (
-              'Start Face Enrollment'
-            )}
-          </button>
-        </div>
-      ) : (
-        <div className='text-center'>
-          <div className='text-green-600 text-2xl mb-2'>✓</div>
-          <h3 className='text-lg font-semibold text-green-600 mb-2'>Face Enrollment Complete</h3>
-          {faceId && (
-            <p className='text-sm text-gray-600'>Face ID: {faceId}</p>
-          )}
-        </div>
-      )}
-
-      {/* Verification Section */}
-      {showVerification && faceVerificationEnabled && !faceVerified && (
+      {/* Verification Only Mode */}
+      {verificationOnly ? (
         <div className='text-center'>
           <h3 className='text-lg font-semibold mb-2'>Face Verification</h3>
           <p className='text-gray-600 mb-4 text-sm'>
@@ -362,6 +321,79 @@ export const FaceEnrollment: React.FC<FaceEnrollmentProps> = ({
             )}
           </button>
         </div>
+      ) : (
+        <>
+          {/* Enrollment Section */}
+          {!faceVerificationEnabled ? (
+            <div className='text-center'>
+              <h3 className='text-lg font-semibold mb-2'>Face Enrollment</h3>
+              <p className='text-gray-600 mb-4 text-sm'>
+                Enroll your face to enable secure authentication.
+              </p>
+              {isAlreadyEnrolled && (
+                <div className='bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded mb-4'>
+                  <p className='text-sm'>
+                    <strong>Note:</strong> It appears you may already be enrolled. If enrollment fails, you can proceed to verification.
+                  </p>
+                </div>
+              )}
+              <button 
+                onClick={enrollNewUser}
+                disabled={enrollmentMutation.isPending}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  enrollmentMutation.isPending
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {enrollmentMutation.isPending ? (
+                  <div className='flex items-center'>
+                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+                    Enrolling...
+                  </div>
+                ) : (
+                  'Start Face Enrollment'
+                )}
+              </button>
+            </div>
+          ) : (
+            <div className='text-center'>
+              <div className='text-green-600 text-2xl mb-2'>✓</div>
+              <h3 className='text-lg font-semibold text-green-600 mb-2'>Face Enrollment Complete</h3>
+              {faceId && (
+                <p className='text-sm text-gray-600'>Face ID: {faceId}</p>
+              )}
+            </div>
+          )}
+
+          {/* Verification Section */}
+          {showVerification && faceVerificationEnabled && !faceVerified && (
+            <div className='text-center'>
+              <h3 className='text-lg font-semibold mb-2'>Face Verification</h3>
+              <p className='text-gray-600 mb-4 text-sm'>
+                Verify your enrolled face to complete the setup.
+              </p>
+              <button 
+                onClick={verifyUser}
+                disabled={verificationMutation.isPending}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  verificationMutation.isPending
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+              >
+                {verificationMutation.isPending ? (
+                  <div className='flex items-center'>
+                    <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+                    Verifying...
+                  </div>
+                ) : (
+                  'Start Face Verification'
+                )}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {faceVerified && (
