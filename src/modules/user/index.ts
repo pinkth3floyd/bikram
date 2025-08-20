@@ -17,22 +17,15 @@ export { UserService } from './UserService'
 
 // Hook exports
 export * from './hooks/useUser'
-export { useFaceIO } from './hooks/useFaceIO'
+
 
 // Component exports
 export { UserProfile } from './components/UserProfile'
 export { CustomSignUp } from './components/CustomSignUp'
 export { CustomSignIn } from './components/CustomSignIn'
-export { FaceEnrollment } from './components/FaceEnrollment'
-export { FaceVerification } from './components/FaceVerification'
-export { FaceVerificationCheck } from './components/FaceVerificationCheck'
-export { FaceVerificationSettings } from './components/FaceVerificationSettings'
-export { SignInWithFaceVerification } from './components/SignInWithFaceVerification'
-export { FaceVerificationErrorBoundary } from './components/FaceVerificationErrorBoundary'
-// export { FaceVerificationDebug } from './components/FaceVerificationDebug'
+
 export { ClientOnly } from './components/ClientOnly'
-export { FaceVerificationRedirect } from './components/FaceVerificationRedirect'
-export { FaceIOScriptLoader } from './components/FaceIOScriptLoader'
+
 
 // Type exports
 export type {
