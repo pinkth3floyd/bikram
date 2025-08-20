@@ -54,11 +54,11 @@ export default function RootLayout({
             }}
           />
 
-        {/* FaceIO Script */}
-        <Script
+        {/* FaceIO Script - Removed to avoid conflict with npm module */}
+        {/* <Script
           src="https://cdn.faceio.net/fio.js"
           strategy="afterInteractive"
-        />
+        /> */}
 
         <noscript>
             <iframe

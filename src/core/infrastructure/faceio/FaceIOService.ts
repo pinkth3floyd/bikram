@@ -47,8 +47,8 @@ export class FaceIOService {
   private faceio: FaceIOInstance | null = null
   private appId: string
 
-  constructor(appId: string) {
-    this.appId = appId
+  constructor(appId?: string) {
+    this.appId = appId || process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'fioae5c6'
     // Only initialize on client side
     if (typeof window !== 'undefined') {
       // Initialize asynchronously

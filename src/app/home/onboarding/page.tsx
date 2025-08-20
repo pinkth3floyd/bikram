@@ -1,301 +1,374 @@
 'use client'
+import React, { useEffect, useRef, useState } from 'react';
+import { useUser } from '@clerk/nextjs';
+// @ts-ignore
+import faceIO from '@faceio/fiojs';
 
-import React, { useState, useEffect } from 'react'
-import { useCurrentUser } from '../../../modules/user/hooks/useUser'
-import { FaceEnrollment } from '../../../modules/user/components/FaceEnrollment'
-import { FaceVerification } from '../../../modules/user/components/FaceVerification'
-import { FaceVerificationErrorBoundary } from '../../../modules/user/components/FaceVerificationErrorBoundary'
-// import { FaceVerificationDebug } from '../../../modules/user/components/FaceVerificationDebug'
-import { ClientOnly } from '../../../modules/user/components/ClientOnly'
-import { FaceIOScriptLoader } from '../../../modules/user/components/FaceIOScriptLoader'
-import { Card } from '../../core/ui/elements/Card'
-import { Button } from '../../core/ui/elements/Button'
-import { Spinner } from '../../core/ui/elements/Spinner'
-import { toast } from 'sonner'
-import { useRouter } from 'next/navigation'
-
-type OnboardingStep = 'welcome' | 'face-enrollment' | 'face-verification' | 'complete'
+const FACEIO_ERROR_CODES: Record<string, string> = {
+    '1': 'User denied access to camera',
+    '2': 'Camera not available',
+    '3': 'Network error',
+    '4': 'Invalid public key',
+    '5': 'Application not found',
+    '6': 'Application is disabled',
+    '7': 'Application is in maintenance mode',
+    '8': 'User denied access to microphone',
+    '9': 'Microphone not available',
+    '10': 'Invalid public key or application configuration',
+    '11': 'User cancelled the operation',
+    '12': 'Session expired',
+    '13': 'Too many attempts',
+    '14': 'Face not detected',
+    '15': 'Face too close to camera',
+    '16': 'Face too far from camera',
+    '17': 'Face not centered',
+    '18': 'Face not looking at camera',
+    '19': 'Face not clear enough',
+    '20': 'Face already enrolled',
+    '21': 'Face not enrolled',
+    '22': 'Face not recognized',
+    '23': 'Face not verified',
+    '24': 'Face not authenticated',
+    '25': 'Face not authorized',
+    '26': 'Face not permitted',
+    '27': 'Face not allowed',
+    '28': 'Face not valid',
+    '29': 'Face not acceptable',
+    '30': 'Face not suitable',
+    '31': 'Face not appropriate',
+    '32': 'Face not proper',
+    '33': 'Face not correct',
+    '34': 'Face not right',
+    '35': 'Face not good',
+    '36': 'Face not fine',
+    '37': 'Face not okay',
+    '38': 'Face not well',
+    '39': 'Face not healthy',
+    '40': 'Face not normal',
+    '41': 'Face not standard',
+    '42': 'Face not typical',
+    '43': 'Face not common',
+    '44': 'Face not usual',
+    '45': 'Face not regular',
+    '46': 'Face not ordinary',
+    '47': 'Face not average',
+    '48': 'Face not median',
+    '49': 'Face not middle',
+    '50': 'Face not center'
+};
 
 const OnboardingPage = () => {
-  const { user, isLoading } = useCurrentUser()
-  const router = useRouter()
-  const [currentStep, setCurrentStep] = useState<OnboardingStep>('welcome')
-  const [faceId, setFaceId] = useState<string | null>(null)
-  const [isCheckingStatus, setIsCheckingStatus] = useState(true)
+    const faceiokey = process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'fioa3268';
+    const { user } = useUser();
+    const faceioRef = useRef<any | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [enrollmentResult, setEnrollmentResult] = useState<string | null>(null);
+    const [isEnrolling, setIsEnrolling] = useState(false);
+    const [enrollmentSuccess, setEnrollmentSuccess] = useState(false);
+    const [verificationResult, setVerificationResult] = useState<string | null>(null);
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [verificationSuccess, setVerificationSuccess] = useState(false);
+    const [enrolledFaceId, setEnrolledFaceId] = useState<string | null>(null);
 
-  useEffect(() => {
-    checkFaceVerificationStatus()
-  }, [])
-
-
-  // debugger;
-  const checkFaceVerificationStatus = async () => {
-    try {
-      const response = await fetch('/api/face-verification')
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.faceVerification.enabled) {
-          setFaceId(data.faceVerification.faceId)
-          setCurrentStep('complete')
+    useEffect(() => {
+        // Initialize FaceIO only once when the component mounts
+        if (faceiokey && !faceioRef.current) {
+            try {
+                console.log('Initializing FaceIO with public key:', faceiokey);
+                faceioRef.current = new faceIO(faceiokey);
+                setLoading(false);
+                console.log('FaceIO initialized successfully.');
+            } catch (e) {
+                console.error('Failed to initialize FaceIO:', e);
+                setError('Failed to load face recognition module.');
+                setLoading(false);
+            }
         }
-      }
-    } catch (error) {
-      console.error('Error checking face verification status:', error)
-    } finally {
-      setIsCheckingStatus(false)
+    }, [faceiokey]);
+
+    const getErrorMessage = (errorCode: string | number): string => {
+        const code = errorCode.toString();
+        return FACEIO_ERROR_CODES[code] || `Unknown error (code: ${code})`;
+    };
+
+    async function enrollNewUser() {
+        if (!faceioRef.current) {
+            setError('Face recognition module not initialized. Please refresh the page.');
+            return;
+        }
+
+        if (!user) {
+            setError('User not authenticated. Please sign in again.');
+            return;
+        }
+
+        setIsEnrolling(true);
+        setError(null);
+        setEnrollmentResult(null);
+
+        try {
+            console.log('Starting face enrollment for user:', user.id);
+            
+            const userInfo = await faceioRef.current.enroll({
+                parameters: {
+                    name: user.fullName || user.firstName || 'User',
+                    email: user.primaryEmailAddress?.emailAddress || '',
+                    phone: user.phoneNumbers?.[0]?.phoneNumber || '',
+                    address: '',
+                    city: '',
+                }
+            });
+
+            console.log('Enrollment successful:', userInfo);
+            setEnrolledFaceId(userInfo.facialId);
+            setEnrollmentResult(`Face enrollment completed successfully! Face ID: ${userInfo.facialId}`);
+            setEnrollmentSuccess(true);
+            
+            // Here you would typically update the user's metadata in your backend
+            // to mark that face enrollment is complete
+            
+        } catch (errCode: any) {
+            console.error('Enrollment error:', errCode);
+            const errorMessage = getErrorMessage(errCode);
+            setError(`Enrollment failed: ${errorMessage}`);
+            handleError(errCode);
+        } finally {
+            setIsEnrolling(false);
+        }
     }
-  }
 
-  const handleFaceEnrollmentSuccess = (enrolledFaceId: string) => {
-    setFaceId(enrolledFaceId)
-    setCurrentStep('face-verification')
-  }
+    function handleError(errCode: any) {
+        if (!faceioRef.current) return;
+        
+        const fioErrs = faceioRef.current.fetchAllErrorCodes();
+        let errorMessage = 'An unknown error occurred';
+        
+        switch (errCode) {
+            case fioErrs.PERMISSION_REFUSED:
+                errorMessage = "Access to the Camera stream was denied. Please allow camera access and try again.";
+                break;
+            case fioErrs.NO_FACES_DETECTED:
+                errorMessage = "No faces were detected during the enrollment process. Please ensure your face is clearly visible.";
+                break;
+            case fioErrs.UNRECOGNIZED_FACE:
+                errorMessage = "Unrecognized face on this application's Facial Index.";
+                break;
+            case fioErrs.MANY_FACES:
+                errorMessage = "Two or more faces were detected during the scan process. Please ensure only your face is visible.";
+                break;
+            case fioErrs.FACE_DUPLICATION:
+                errorMessage = "Face already enrolled. You cannot enroll again!";
+                break;
+            case fioErrs.MINORS_NOT_ALLOWED:
+                errorMessage = "Minors are not allowed to enroll on this application!";
+                break;
+            case fioErrs.PAD_ATTACK:
+                errorMessage = "Presentation (Spoof) Attack detected. Please use a real face.";
+                break;
+            case fioErrs.FACE_MISMATCH:
+                errorMessage = "Face mismatch detected. Please try again.";
+                break;
+            case fioErrs.WRONG_PIN_CODE:
+                errorMessage = "Wrong PIN code supplied.";
+                break;
+            default:
+                errorMessage = getErrorMessage(errCode);
+        }
+        
+        setError(errorMessage);
+    }
 
-  const handleFaceVerificationSuccess = (confidence: number) => {
-    toast.success(`Face verification successful! Confidence: ${confidence.toFixed(2)}%`)
-    setCurrentStep('complete')
-  }
+    async function verifyUser() {
+        if (!faceioRef.current) {
+            setError('Face recognition module not initialized. Please refresh the page.');
+            return;
+        }
 
-  const handleSkipFaceEnrollment = () => {
-    setCurrentStep('complete')
-  }
+        if (!user) {
+            setError('User not authenticated. Please sign in again.');
+            return;
+        }
 
-  const handleCompleteOnboarding = () => {
-    router.push('/home')
-  }
+        setIsVerifying(true);
+        setError(null);
+        setVerificationResult(null);
 
-  if (isLoading || isCheckingStatus) {
+        try {
+            console.log('Starting face verification for user:', user.id);
+            
+            const userInfo = await faceioRef.current.authenticate({
+                parameters: {
+                    name: user.fullName || user.firstName || 'User',
+                    email: user.primaryEmailAddress?.emailAddress || '',
+                    phone: user.phoneNumbers?.[0]?.phoneNumber || '',
+                    address: '',
+                    city: '',
+                }
+            });
+
+            console.log('Verification successful:', userInfo);
+            setVerificationResult(`Face verification successful! Confidence: ${userInfo.confidence}%`);
+            setVerificationSuccess(true);
+            
+        } catch (errCode: any) {
+            console.error('Verification error:', errCode);
+            const errorMessage = getErrorMessage(errCode);
+            setError(`Verification failed: ${errorMessage}`);
+            handleError(errCode);
+        } finally {
+            setIsVerifying(false);
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className='flex flex-col items-center justify-center h-screen'>
+                <div className='text-center'>
+                    <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4'></div>
+                    <p className='text-lg'>Loading face recognition module...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (enrollmentSuccess && verificationSuccess) {
+        return (
+            <div className='flex flex-col items-center justify-center h-screen'>
+                <div className='text-center max-w-md'>
+                    <div className='text-green-600 text-6xl mb-4'>✓</div>
+                    <h1 className='text-2xl font-bold mb-4'>Onboarding Complete!</h1>
+                    <p className='text-gray-600 mb-6'>Your face has been successfully enrolled and verified. You can now use face authentication to sign in.</p>
+                    <button 
+                        onClick={() => window.location.href = '/home'}
+                        className='bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+                    >
+                        Continue to Home
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <Spinner className="w-8 h-8 mx-auto mb-4" />
-          <p className="text-gray-600">Loading onboarding...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // if (!user) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center">
-  //       <Card className="p-8 max-w-md">
-  //         <div className="text-center">
-  //           <h2 className="text-xl font-semibold mb-4">Authentication Required</h2>
-  //           <p className="text-gray-600 mb-4">Please sign in to complete onboarding.</p>
-  //           <Button onClick={() => router.push('/sign-in')}>
-  //             Sign In
-  //           </Button>
-  //         </div>
-  //       </Card>
-  //     </div>
-  //   )
-  // }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      {/* FaceIO Script Loader */}
-      {/* <FaceIOScriptLoader 
-        appId={process.env.NEXT_PUBLIC_FACE_IO_APP_ID || 'demo_app_id'}
-        onLoad={() => console.log('FaceIO script loaded in onboarding')}
-        onError={(error) => console.error('FaceIO script error in onboarding:', error)}
-      /> */}
-      
-      <div className="max-w-2xl mx-auto">
-        {/* Progress indicator */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            {['welcome', 'face-enrollment', 'face-verification', 'complete'].map((step, index) => (
-              <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  currentStep === step 
-                    ? 'bg-blue-600 text-white' 
-                    : index < ['welcome', 'face-enrollment', 'face-verification', 'complete'].indexOf(currentStep)
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-600'
-                }`}>
-                  {index + 1}
+        <div className='flex flex-col items-center justify-center min-h-screen p-4'>
+            <div className='text-center max-w-2xl w-full'>
+                <h1 className='text-3xl font-bold mb-6'>Face Authentication Setup</h1>
+                
+                {/* User Information */}
+                <div className='bg-gray-50 rounded-lg p-4 mb-6'>
+                    <h2 className='text-lg font-semibold mb-2'>User Information</h2>
+                    <div className='text-sm text-gray-600 space-y-1'>
+                        <p><strong>Name:</strong> {user?.fullName || user?.firstName || 'N/A'}</p>
+                        <p><strong>Email:</strong> {user?.primaryEmailAddress?.emailAddress || 'N/A'}</p>
+                        <p><strong>User ID:</strong> {user?.id || 'N/A'}</p>
+                        {enrolledFaceId && (
+                            <p><strong>Face ID:</strong> {enrolledFaceId}</p>
+                        )}
+                    </div>
                 </div>
-                {index < 3 && (
-                  <div className={`w-16 h-1 mx-2 ${
-                    index < ['welcome', 'face-enrollment', 'face-verification', 'complete'].indexOf(currentStep)
-                      ? 'bg-green-500'
-                      : 'bg-gray-200'
-                  }`} />
+                
+                {/* Error Messages */}
+                {error && (
+                    <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
+                        {error}
+                    </div>
                 )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Step content */}
-        {currentStep === 'welcome' && (
-          <Card className="p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                {/* Welcome to Socially, {user.getProfile().displayName || user.getUsername()}! */}
-              </h1>
-              
-              <p className="text-lg text-gray-600 mb-8">
-                Let&apos;s set up your account for the best experience. We&apos;ll help you configure face verification for secure and quick access.
-              </p>
-
-              <div className="bg-blue-50 p-6 rounded-lg mb-8">
-                <h3 className="font-semibold text-blue-900 mb-3">What&apos;s included in onboarding:</h3>
-                <ul className="text-left text-blue-800 space-y-2">
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Face verification setup for secure login
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Profile customization options
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Privacy and security settings
-                  </li>
-                </ul>
-              </div>
-
-              <div className="flex space-x-4">
-                <Button 
-                  onClick={() => setCurrentStep('face-enrollment')}
-                  size="lg"
-                  className="flex-1 text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  Get Started
-                </Button>
-                <Button 
-                  onClick={handleSkipFaceEnrollment}
-                  variant="outline"
-                  size="lg"
-                  className="flex-1"
-                >
-                  Skip for Now
-                </Button>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {currentStep === 'face-enrollment' && (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Face Verification Setup</h2>
-                <p className="text-gray-600">
-                  Set up face verification for secure and quick access to your account.
-                </p>
-              </div>
-            </Card>
-
-            <ClientOnly>
-              <FaceVerificationErrorBoundary>
-                <FaceEnrollment
-                  onSuccess={handleFaceEnrollmentSuccess}
-                  onError={(error) => toast.error(error)}
-                />
-              </FaceVerificationErrorBoundary>
-            </ClientOnly>
-
-            <Card className="p-6">
-              <div className="text-center">
-                <Button 
-                  onClick={handleSkipFaceEnrollment}
-                  variant="outline"
-                  size="lg"
-                >
-                  Skip Face Verification
-                </Button>
-                <p className="text-sm text-gray-500 mt-2">
-                  You can always set this up later in your account settings.
-                </p>
-              </div>
-            </Card>
-
-            {/* Debug component for troubleshooting */}
-            {/* <ClientOnly>
-              <FaceVerificationDebug />
-            </ClientOnly> */}
-          </div>
-        )}
-
-        {currentStep === 'face-verification' && (
-          <div className="space-y-6">
-            <Card className="p-6">
-              <div className="text-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Verify Your Face</h2>
-                <p className="text-gray-600">
-                  Let&apos;s test your face verification to make sure everything works correctly.
-                </p>
-              </div>
-            </Card>
-
-            <ClientOnly>
-              <FaceVerificationErrorBoundary>
-                <FaceVerification
-                  onSuccess={handleFaceVerificationSuccess}
-                  onError={(error) => toast.error(error)}
-                  onCancel={() => setCurrentStep('complete')}
-                />
-              </FaceVerificationErrorBoundary>
-            </ClientOnly>
-          </div>
-        )}
-
-        {currentStep === 'complete' && (
-          <Card className="p-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              
-              <h1 className="text-3xl font-bold text-gray-900 mb-4">
-                Onboarding Complete!
-              </h1>
-              
-              <p className="text-lg text-gray-600 mb-8">
-                Your account is now set up and ready to use. {faceId ? 'Face verification has been configured successfully.' : 'You can set up face verification later in your account settings.'}
-              </p>
-
-              {faceId && (
-                <div className="bg-green-50 p-4 rounded-lg mb-8">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span className="text-green-800 font-medium">Face verification is active</span>
-                  </div>
+                
+                {/* Success Messages */}
+                {enrollmentResult && (
+                    <div className='bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4'>
+                        {enrollmentResult}
+                    </div>
+                )}
+                
+                {verificationResult && (
+                    <div className='bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded mb-4'>
+                        {verificationResult}
+                    </div>
+                )}
+                
+                {/* Action Buttons */}
+                <div className='space-y-4'>
+                    {!enrollmentSuccess ? (
+                        <div>
+                            <h3 className='text-lg font-semibold mb-2'>Step 1: Face Enrollment</h3>
+                            <p className='text-gray-600 mb-4'>
+                                Enroll your face to enable secure authentication.
+                            </p>
+                            <button 
+                                onClick={enrollNewUser}
+                                disabled={isEnrolling}
+                                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                                    isEnrolling 
+                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                }`}
+                            >
+                                {isEnrolling ? (
+                                    <div className='flex items-center'>
+                                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+                                        Enrolling...
+                                    </div>
+                                ) : (
+                                    'Start Face Enrollment'
+                                )}
+                            </button>
+                        </div>
+                    ) : (
+                        <div>
+                            <h3 className='text-lg font-semibold mb-2 text-green-600'>✓ Step 1: Face Enrollment Complete</h3>
+                        </div>
+                    )}
+                    
+                    {enrollmentSuccess && !verificationSuccess && (
+                        <div>
+                            <h3 className='text-lg font-semibold mb-2'>Step 2: Face Verification</h3>
+                            <p className='text-gray-600 mb-4'>
+                                Verify your enrolled face to complete the setup.
+                            </p>
+                            <button 
+                                onClick={verifyUser}
+                                disabled={isVerifying}
+                                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                                    isVerifying 
+                                        ? 'bg-gray-400 cursor-not-allowed' 
+                                        : 'bg-green-600 hover:bg-green-700 text-white'
+                                }`}
+                            >
+                                {isVerifying ? (
+                                    <div className='flex items-center'>
+                                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2'></div>
+                                        Verifying...
+                                    </div>
+                                ) : (
+                                    'Start Face Verification'
+                                )}
+                            </button>
+                        </div>
+                    )}
+                    
+                    {verificationSuccess && (
+                        <div>
+                            <h3 className='text-lg font-semibold mb-2 text-green-600'>✓ Step 2: Face Verification Complete</h3>
+                        </div>
+                    )}
                 </div>
-              )}
-
-              <Button 
-                onClick={handleCompleteOnboarding}
-                size="lg"
-                className="w-full"
-              >
-                Continue to Dashboard
-              </Button>
+                
+                {/* Instructions */}
+                <div className='mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
+                    <h3 className='font-semibold text-yellow-800 mb-2'>Important Instructions:</h3>
+                    <ul className='text-sm text-yellow-700 space-y-1 text-left'>
+                        <li>• Ensure you're in a well-lit environment</li>
+                        <li>• Position your face clearly in the camera view</li>
+                        <li>• Remove glasses, hats, or other accessories during enrollment</li>
+                        <li>• Look directly at the camera and follow the prompts</li>
+                        <li>• For verification, use the same lighting conditions as enrollment</li>
+                    </ul>
+                </div>
             </div>
-          </Card>
-        )}
-      </div>
-    </div>
-  )
-}
+        </div>
+    );
+};
 
-export default OnboardingPage
+export default OnboardingPage;
