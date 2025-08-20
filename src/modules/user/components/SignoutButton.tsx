@@ -1,5 +1,5 @@
 import { SignOutButton, UserButton } from "@clerk/nextjs";
-import { Button } from "../elements/Button";
+import { Button } from "../../../app/core/ui/elements/Button";
 
 export const SignoutButton = () => {
   return (

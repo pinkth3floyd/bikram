@@ -17,12 +17,13 @@ export { UserService } from './UserService'
 
 // Hook exports
 export * from './hooks/useUser'
-
+export * from './hooks/useFaceEnrollment'
 
 // Component exports
 export { UserProfile } from './components/UserProfile'
 export { CustomSignUp } from './components/CustomSignUp'
 export { CustomSignIn } from './components/CustomSignIn'
+export { FaceEnrollment } from './components/FaceEnrollment'
 
 export { ClientOnly } from './components/ClientOnly'
 

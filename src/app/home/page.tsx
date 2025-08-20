@@ -2,7 +2,7 @@
 
 // import { useUser } from '@clerk/nextjs'
 import React from 'react'
-import { SignoutButton } from '../core/ui/components/SignoutButton'
+import { SignoutButton } from '../../modules/user/components/SignoutButton'
 
 const HomePage = () => {
 
