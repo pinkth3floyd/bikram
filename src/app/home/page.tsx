@@ -16,12 +16,7 @@ const HomePage = () => {
         Onboarding
       </button>
 
-<SignOutButton>
-  <button>
-    Logout
-  </button>
-</SignOutButton>
-     
+
 
 
 

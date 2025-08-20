@@ -2,6 +2,8 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
 import React from 'react'
+import { SignOutButton } from '@clerk/nextjs';
+import Link from 'next/link';
 
 const HomeLayout = async({ children }: { children: React.ReactNode }) => {
   const user = (await auth());
@@ -32,6 +34,16 @@ const HomeLayout = async({ children }: { children: React.ReactNode }) => {
     <div>
 
       <p>User ID: {user.userId}</p>
+      <SignOutButton>
+      <Link
+      href={'/sign-in'}
+                className="bg-blue-600 m-4 p-4 rounded-md hover:bg-blue-700 text-white border-0 min-w-[100px]"
+           
+              >
+                Logout
+              </Link>
+</SignOutButton>
+     
      {/* <p>User Metadata: {JSON.stringify(await user?.privateMetadata)}</p> */}
 
         {children}
