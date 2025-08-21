@@ -99,7 +99,7 @@ export class CreateUserUseCase {
     const now = new Date()
 
     return new User(
-      '', // ID will be set by Clerk
+      dto.id || '', // Use provided ID or empty string
       dto.email,
       dto.username,
       role,

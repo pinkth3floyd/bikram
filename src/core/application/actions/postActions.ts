@@ -9,6 +9,7 @@ import { DeletePostUseCase } from '../use-cases/DeletePostUseCase';
 import { CreatePostDto, GetPostFeedDto, UpdatePostDto } from '../dto/PostDto';
 import { initDatabase, getDatabaseService } from '@/core/infrastructure/database/init';
 import { blobService } from '@/core/infrastructure/services/BlobService';
+import { ensureUserExists } from './userActions';
 
 export async function createPost(data: CreatePostDto) {
   try {
@@ -112,6 +113,22 @@ export async function getPostFeed(data: GetPostFeedDto) {
     await initDatabase();
     const databaseService = getDatabaseService();
     const postRepository = databaseService.getPostRepository();
+
+    // Ensure user exists in our database
+    const userResult = await ensureUserExists(userId);
+    if (!userResult.success) {
+      return {
+        success: false,
+        error: userResult.error || 'Failed to ensure user exists',
+        posts: [],
+        pagination: {
+          page: data.page,
+          limit: data.limit,
+          total: 0,
+          totalPages: 0
+        }
+      };
+    }
     
     // Create get post feed use case
     const getPostFeedUseCase = new GetPostFeedUseCase(postRepository);
@@ -221,6 +238,15 @@ export async function updatePost(postId: string, data: UpdatePostDto) {
     await initDatabase();
     const databaseService = getDatabaseService();
     const postRepository = databaseService.getPostRepository();
+
+    // Ensure user exists in our database
+    const userResult = await ensureUserExists(userId);
+    if (!userResult.success) {
+      return {
+        success: false,
+        error: userResult.error || 'Failed to ensure user exists'
+      };
+    }
     
     // Handle file uploads if present
     const processedContent = data.content ? { ...data.content } : undefined;
@@ -314,6 +340,15 @@ export async function deletePost(postId: string) {
     await initDatabase();
     const databaseService = getDatabaseService();
     const postRepository = databaseService.getPostRepository();
+
+    // Ensure user exists in our database
+    const userResult = await ensureUserExists(userId);
+    if (!userResult.success) {
+      return {
+        success: false,
+        error: userResult.error || 'Failed to ensure user exists'
+      };
+    }
     
     // Create delete post use case
     const deletePostUseCase = new DeletePostUseCase(postRepository);

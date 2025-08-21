@@ -2,6 +2,7 @@ import { UserRole } from '../../domain/value-objects/UserRole'
 import { UserStatus } from '../../domain/value-objects/UserStatus'
 
 export interface CreateUserDto {
+  id?: string // Optional Clerk user ID
   email: string
   username: string
   role?: UserRole
