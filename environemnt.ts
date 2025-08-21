@@ -16,6 +16,7 @@ declare namespace NodeJS {
       TURSO_AUTH_TOKEN:string;
       TURSO_URL_READONLY?:string;
       TURSO_AUTH_TOKEN_READONLY?:string;
+      BLOB_READ_WRITE_TOKEN:string;
     }
   }
   
