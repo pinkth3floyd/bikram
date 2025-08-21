@@ -1,7 +1,13 @@
 import { PostType, PostPrivacy, PostContent } from '../../domain/entities/Post';
 
+// Extended PostContent for file uploads
+export interface CreatePostContent extends PostContent {
+  videoFile?: File;
+  imageFile?: File;
+}
+
 export interface CreatePostDto {
-  content: PostContent;
+  content: CreatePostContent;
   privacy?: PostPrivacy;
   scheduledFor?: Date;
 }
@@ -10,6 +16,7 @@ export interface UpdatePostDto {
   content?: PostContent;
   privacy?: PostPrivacy;
   scheduledFor?: Date;
+  editReason?: string;
 }
 
 export interface PostResponseDto {

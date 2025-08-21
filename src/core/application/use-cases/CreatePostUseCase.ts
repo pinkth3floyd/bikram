@@ -1,4 +1,4 @@
-import { Post, PostContent, PostPrivacy } from '../../domain/entities/Post';
+import { Post, PostPrivacy } from '../../domain/entities/Post';
 import { PostRepository } from '../../domain/repositories/PostRepository';
 import { CreatePostDto } from '../dto/PostDto';
 

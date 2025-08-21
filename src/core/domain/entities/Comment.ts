@@ -1,4 +1,4 @@
-import { User } from './User';
+
 
 export enum CommentStatus {
   ACTIVE = 'active',

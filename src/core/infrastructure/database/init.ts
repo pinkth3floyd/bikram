@@ -26,6 +26,16 @@ export class DatabaseInitializer {
   }
 
   /**
+   * Get the database service
+   */
+  public static getDatabaseService() {
+    if (!this.isInitialized) {
+      throw new Error('Database not initialized. Call initialize() first.');
+    }
+    return databaseService;
+  }
+
+  /**
    * Get the user repository
    */
   public static getUserRepository(): UserRepository {
@@ -75,6 +85,7 @@ export class DatabaseInitializer {
 
 // Export convenience functions
 export const initDatabase = () => DatabaseInitializer.initialize();
+export const getDatabaseService = () => DatabaseInitializer.getDatabaseService();
 export const getUserRepository = () => DatabaseInitializer.getUserRepository();
 export const isDatabaseHealthy = () => DatabaseInitializer.isHealthy();
 export const getDatabaseStatus = () => DatabaseInitializer.getStatus();

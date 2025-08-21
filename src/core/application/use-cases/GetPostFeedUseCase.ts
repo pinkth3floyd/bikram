@@ -14,7 +14,7 @@ export class GetPostFeedUseCase {
 
     // Convert to DTOs
     const posts = await Promise.all(
-      result.posts.map(post => this.convertToResponseDto(post, userId))
+      result.posts.map(post => this.convertToResponseDto(post))
     );
 
     return {
@@ -36,7 +36,7 @@ export class GetPostFeedUseCase {
     }
   }
 
-  private async convertToResponseDto(post: Post, currentUserId: string): Promise<PostResponseDto> {
+  private async convertToResponseDto(post: Post): Promise<PostResponseDto> {
     const content = post.getContent();
     const stats = post.getStats();
     const metadata = post.getMetadata();

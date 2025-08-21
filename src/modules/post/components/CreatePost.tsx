@@ -35,6 +35,8 @@ export const CreatePost: React.FC<CreatePostProps> = ({
   const createPostMutation = useCreatePost();
   const [text, setText] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [privacy, setPrivacy] = useState<PostPrivacy>(PostPrivacy.PUBLIC);
   const [scheduledFor, setScheduledFor] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -43,7 +45,8 @@ export const CreatePost: React.FC<CreatePostProps> = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const privacyOptions = [
     { value: PostPrivacy.PUBLIC, label: 'Public', icon: Globe },
@@ -113,6 +116,8 @@ export const CreatePost: React.FC<CreatePostProps> = ({
       content: {
         text: text.trim() || undefined,
         videoUrl: videoUrl.trim() || undefined,
+        videoFile: videoFile || undefined,
+        imageFile: imageFile || undefined,
         hashtags: hashtags.length > 0 ? hashtags : undefined,
         mentions: mentions.length > 0 ? mentions : undefined
       },
@@ -129,6 +134,8 @@ export const CreatePost: React.FC<CreatePostProps> = ({
         // Reset form
         setText('');
         setVideoUrl('');
+        setVideoFile(null);
+        setImageFile(null);
         setPrivacy(PostPrivacy.PUBLIC);
         setScheduledFor('');
         setHashtags([]);
@@ -141,11 +148,59 @@ export const CreatePost: React.FC<CreatePostProps> = ({
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // TODO: Handle file upload to cloud storage
-      console.log('File selected:', file);
+      // Validate file type
+      const allowedTypes = ['video/mp4', 'video/avi', 'video/mov', 'video/wmv', 'video/flv', 'video/webm'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please select a valid video file (MP4, AVI, MOV, WMV, FLV, WebM)');
+        return;
+      }
+      
+      // Validate file size (100MB limit)
+      if (file.size > 100 * 1024 * 1024) {
+        setError('Video file size must be less than 100MB');
+        return;
+      }
+      
+      setVideoFile(file);
+      setError(null);
+    }
+  };
+
+  const handleImageFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!allowedTypes.includes(file.type)) {
+        setError('Please select a valid image file (JPEG, PNG, GIF, WebP)');
+        return;
+      }
+      
+      // Validate file size (10MB limit)
+      if (file.size > 10 * 1024 * 1024) {
+        setError('Image file size must be less than 10MB');
+        return;
+      }
+      
+      setImageFile(file);
+      setError(null);
+    }
+  };
+
+  const removeVideoFile = () => {
+    setVideoFile(null);
+    if (videoInputRef.current) {
+      videoInputRef.current.value = '';
+    }
+  };
+
+  const removeImageFile = () => {
+    setImageFile(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = '';
     }
   };
 
@@ -213,26 +268,75 @@ export const CreatePost: React.FC<CreatePostProps> = ({
         </div>
 
         {/* File Upload */}
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex items-center space-x-2">
             <Upload className="h-4 w-4 text-gray-500" />
             <span className="text-sm font-medium text-gray-700">Upload Media</span>
           </div>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*,video/*"
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <Button
-            variant="outline"
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full"
-          >
-            <Upload className="h-4 w-4 mr-2" />
-            Choose File
-          </Button>
+          
+          {/* Video Upload */}
+          <div className="space-y-2">
+            <input
+              ref={videoInputRef}
+              type="file"
+              accept="video/*"
+              onChange={handleVideoFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              onClick={() => videoInputRef.current?.click()}
+              className="w-full"
+            >
+              <Video className="h-4 w-4 mr-2" />
+              Upload Video
+            </Button>
+            {videoFile && (
+              <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
+                <span className="text-sm text-green-700">{videoFile.name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeVideoFile}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <input
+              ref={imageInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageFileUpload}
+              className="hidden"
+            />
+            <Button
+              variant="outline"
+              onClick={() => imageInputRef.current?.click()}
+              className="w-full"
+            >
+              <Upload className="h-4 w-4 mr-2" />
+              Upload Image
+            </Button>
+            {imageFile && (
+              <div className="flex items-center justify-between p-2 bg-green-50 border border-green-200 rounded">
+                <span className="text-sm text-green-700">{imageFile.name}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={removeImageFile}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Hashtags and Mentions */}

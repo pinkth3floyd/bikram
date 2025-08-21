@@ -14,5 +14,5 @@ export { CommentStatus } from '@/core/domain/entities/Comment';
 export { LikeType, LikeReaction } from '@/core/domain/entities/Like';
 
 // Hooks
-export { useCreatePost, useLikePost, useUnlikePost, useDeletePost } from './hooks/usePostMutations';
+export { useCreatePost, useLikePost, useUnlikePost, useDeletePost, useUpdatePost } from './hooks/usePostMutations';
 export { usePostFeed, usePostById } from './hooks/usePostQueries';

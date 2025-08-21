@@ -65,8 +65,8 @@ export const PostFeed: React.FC<PostFeedProps> = ({
     onLike?.(postId, reaction);
   };
 
-  const handleComment = () => {
-    // TODO: Implement comment functionality
+  const handleComment = (postId: string) => {
+    onComment?.(postId);
   };
 
   const handleShare = (postId: string) => {

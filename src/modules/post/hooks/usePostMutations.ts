@@ -1,8 +1,8 @@
 'use client'
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { createPost, likePost, unlikePost, deletePost } from '@/core/application/actions/postActions';
-import { CreatePostDto } from '@/core/application/dto/PostDto';
+import { createPost, likePost, unlikePost, deletePost, updatePost } from '@/core/application/actions/postActions';
+import { CreatePostDto, UpdatePostDto } from '@/core/application/dto/PostDto';
 import { toast } from 'sonner';
 
 export function useCreatePost() {
@@ -63,6 +63,28 @@ export function useUnlikePost() {
     onError: (error) => {
       console.error('Unlike post error:', error);
       toast.error('Failed to unlike post. Please try again.');
+    }
+  });
+}
+
+export function useUpdatePost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, data }: { postId: string; data: UpdatePostDto }) => 
+      updatePost(postId, data),
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success('Post updated successfully!');
+        // Invalidate and refetch posts
+        queryClient.invalidateQueries({ queryKey: ['posts'] });
+      } else {
+        toast.error(data.error || 'Failed to update post');
+      }
+    },
+    onError: (error) => {
+      console.error('Update post error:', error);
+      toast.error('Failed to update post. Please try again.');
     }
   });
 }

@@ -1,13 +1,17 @@
 import { getDatabaseStatus, healthCheck } from './connection';
 import { UserRepositoryImpl } from './repositories/UserRepositoryImpl';
+import { PostRepositoryImpl } from './repositories/PostRepositoryImpl';
 import { UserRepository } from '../../domain/repositories/UserRepository';
+import { PostRepository } from '../../domain/repositories/PostRepository';
 
 export class DatabaseService {
   private static instance: DatabaseService;
   private userRepository: UserRepository;
+  private postRepository: PostRepository;
 
   private constructor() {
     this.userRepository = new UserRepositoryImpl();
+    this.postRepository = new PostRepositoryImpl();
   }
 
   public static getInstance(): DatabaseService {
@@ -20,6 +24,10 @@ export class DatabaseService {
   // Repository getters
   public getUserRepository(): UserRepository {
     return this.userRepository;
+  }
+
+  public getPostRepository(): PostRepository {
+    return this.postRepository;
   }
 
   // Database health and status

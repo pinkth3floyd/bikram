@@ -1,4 +1,4 @@
-import { User } from './User';
+
 
 export enum PostType {
   TEXT = 'text',
@@ -15,6 +15,7 @@ export enum PostPrivacy {
 export interface PostContent {
   text?: string;
   videoUrl?: string;
+  imageUrl?: string;
   videoThumbnail?: string;
   videoDuration?: number; // in seconds
   mentions?: string[]; // user IDs mentioned in the post
