@@ -10,6 +10,12 @@ declare namespace NodeJS {
       NEXT_PUBLIC_CLERK_SIGN_UP_URL:string;
       NEXT_PUBLIC_CLERK_SIGN_IN_URL:string;
       NEXT_PUBLIC_FACE_IO_APP_ID:string;
+      
+      // Turso Database Configuration
+      TURSO_URL:string;
+      TURSO_AUTH_TOKEN:string;
+      TURSO_URL_READONLY?:string;
+      TURSO_AUTH_TOKEN_READONLY?:string;
     }
   }
   
