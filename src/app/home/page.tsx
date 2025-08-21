@@ -1,133 +1,36 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 
-import { PostFeed, PostResponseDto, LikeReaction, PostType, PostPrivacy } from '../../modules/post'
+import { PostFeed, LikeReaction, CreatePost, PostPrivacy } from '../../modules/post'
+import { usePostFeed } from '../../modules/post/hooks/usePostQueries'
+import { useLikePost, useDeletePost } from '../../modules/post/hooks/usePostMutations'
 import MainNav from '../core/ui/components/MainNav'
 
 const HomePage = () => {
   const { user } = useUser()
-  const [posts, setPosts] = useState<PostResponseDto[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [hasMore, setHasMore] = useState(false)
-
-  // Mock data for demonstration
-  const mockPosts: PostResponseDto[] = [
-    {
-      id: '1',
-      authorId: 'user1',
-      author: {
-        id: 'user1',
-        displayName: 'John Doe',
-        username: 'johndoe',
-        avatar: undefined
-      },
-      content: {
-        text: 'Just created my first post! 🎉 #excited #firstpost',
-        hashtags: ['excited', 'firstpost'],
-        mentions: []
-      },
-      type: PostType.TEXT,
-      privacy: PostPrivacy.PUBLIC,
-      stats: {
-        likesCount: 5,
-        commentsCount: 2,
-        sharesCount: 1,
-        viewsCount: 25,
-        engagementRate: 0.32
-      },
-      metadata: {
-        isEdited: false,
-        isPinned: false,
-        isPromoted: false,
-        isSponsored: false,
-        language: 'en',
-        moderationStatus: 'approved'
-      },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      isLikedByCurrentUser: false,
-      currentUserReaction: undefined
-    },
-    {
-      id: '2',
-      authorId: 'user2',
-      author: {
-        id: 'user2',
-        displayName: 'Jane Smith',
-        username: 'janesmith',
-        avatar: undefined
-      },
-      content: {
-        text: 'Check out this amazing video!',
-        videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
-        videoDuration: 212,
-        hashtags: ['video', 'amazing'],
-        mentions: []
-      },
-      type: PostType.MIXED,
-      privacy: PostPrivacy.PUBLIC,
-      stats: {
-        likesCount: 12,
-        commentsCount: 5,
-        sharesCount: 3,
-        viewsCount: 150,
-        engagementRate: 0.13
-      },
-      metadata: {
-        isEdited: false,
-        isPinned: false,
-        isPromoted: false,
-        isSponsored: false,
-        language: 'en',
-        moderationStatus: 'approved'
-      },
-      createdAt: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
-      updatedAt: new Date(Date.now() - 3600000).toISOString(),
-      isLikedByCurrentUser: true,
-      currentUserReaction: 'love'
-    }
-  ]
-
-  useEffect(() => {
-    // Simulate loading posts
-    const loadPosts = async () => {
-      setIsLoading(true)
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      setPosts(mockPosts)
-      setIsLoading(false)
-      setHasMore(false)
-    }
-
-    loadPosts()
-  }, [])
+  const [showCreatePost, setShowCreatePost] = useState(false)
+  
+  // React Query hooks
+  const { data: feedData, isLoading } = usePostFeed({
+    page: 1,
+    limit: 20,
+    privacy: PostPrivacy.PUBLIC
+  })
+  
+  const likePostMutation = useLikePost()
+  const deletePostMutation = useDeletePost()
+  
+  const posts = feedData?.posts || []
+  const hasMore = feedData?.pagination ? (feedData.pagination.page || 1) < (feedData.pagination.totalPages || 1) : false
 
   const handleLike = (postId: string, reaction: LikeReaction) => {
-    setPosts(prevPosts => 
-      prevPosts.map(post => {
-        if (post.id === postId) {
-          const isCurrentlyLiked = post.isLikedByCurrentUser
-          return {
-            ...post,
-            isLikedByCurrentUser: !isCurrentlyLiked,
-            currentUserReaction: !isCurrentlyLiked ? reaction : undefined,
-            stats: {
-              ...post.stats,
-              likesCount: isCurrentlyLiked 
-                ? post.stats.likesCount - 1 
-                : post.stats.likesCount + 1
-            }
-          }
-        }
-        return post
-      })
-    )
+    likePostMutation.mutate({ postId, reaction })
   }
 
-  const handleComment = (postId: string) => {
-    console.log('Comment on post:', postId)
+  const handleComment = () => {
+    console.log('Comment functionality coming soon')
     // TODO: Implement comment functionality
   }
 
@@ -142,7 +45,7 @@ const HomePage = () => {
   }
 
   const handleDelete = (postId: string) => {
-    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId))
+    deletePostMutation.mutate(postId)
   }
 
   const handleReport = (postId: string) => {
@@ -151,11 +54,8 @@ const HomePage = () => {
   }
 
   const handleRefresh = async () => {
-    setIsLoading(true)
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500))
-    setPosts(mockPosts)
-    setIsLoading(false)
+    // React Query will handle refetching
+    console.log('Refreshing posts...')
   }
 
   const handleLoadMore = () => {
@@ -163,12 +63,61 @@ const HomePage = () => {
     console.log('Load more posts')
   }
 
+  const handlePostCreated = () => {
+    // React Query will automatically refetch and show the new post
+    setShowCreatePost(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <MainNav />
       
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto space-y-6">
+          {/* Welcome Section */}
+          {user && (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                Welcome back, {user.firstName || user.username || 'User'}! 👋
+              </h1>
+              <p className="text-gray-600 mb-4">
+                Share your thoughts, videos, or updates with your community.
+              </p>
+              
+              {/* Quick Post Creation */}
+              <div className="bg-gray-50 rounded-lg p-4 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-semibold">
+                      {user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      onClick={() => setShowCreatePost(true)}
+                      className="w-full text-left text-gray-500 hover:text-gray-700 bg-white rounded-lg px-4 py-3 border border-gray-200 hover:border-blue-300 transition-colors"
+                    >
+                      What&apos;s on your mind?
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Create Post Modal */}
+          {showCreatePost && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <CreatePost
+                  onPostCreated={handlePostCreated}
+                  onCancel={() => setShowCreatePost(false)}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Posts Feed */}
           <PostFeed
             posts={posts}
             onLike={handleLike}
@@ -181,7 +130,7 @@ const HomePage = () => {
             onLoadMore={handleLoadMore}
             isLoading={isLoading}
             hasMore={hasMore}
-            showCreatePost={!!user}
+            showCreatePost={false} // We're handling this separately now
           />
         </div>
       </div>

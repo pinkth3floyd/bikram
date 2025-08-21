@@ -12,3 +12,7 @@ export type { LikeResponseDto, CreateLikeDto, UpdateLikeDto } from '@/core/appli
 export { PostType, PostPrivacy } from '@/core/domain/entities/Post';
 export { CommentStatus } from '@/core/domain/entities/Comment';
 export { LikeType, LikeReaction } from '@/core/domain/entities/Like';
+
+// Hooks
+export { useCreatePost, useLikePost, useUnlikePost, useDeletePost } from './hooks/usePostMutations';
+export { usePostFeed, usePostById } from './hooks/usePostQueries';

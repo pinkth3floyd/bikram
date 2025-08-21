@@ -8,6 +8,7 @@ import { TextArea } from '@/app/core/ui/elements/TextArea';
 import { Select } from '@/app/core/ui/elements/Select';
 import { Card } from '@/app/core/ui/elements/Card';
 import { Badge } from '@/app/core/ui/elements/Badge';
+import { useCreatePost } from '../hooks/usePostMutations';
 import { 
   Video, 
   Globe, 
@@ -31,11 +32,11 @@ export const CreatePost: React.FC<CreatePostProps> = ({
   className = ''
 }) => {
   const { user } = useUser();
+  const createPostMutation = useCreatePost();
   const [text, setText] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [privacy, setPrivacy] = useState<PostPrivacy>(PostPrivacy.PUBLIC);
   const [scheduledFor, setScheduledFor] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [mentions, setMentions] = useState<string[]>([]);
@@ -106,43 +107,37 @@ export const CreatePost: React.FC<CreatePostProps> = ({
       return;
     }
 
-    setIsSubmitting(true);
     setError(null);
 
-    try {
-      const postData = {
-        content: {
-          text: text.trim() || undefined,
-          videoUrl: videoUrl.trim() || undefined,
-          hashtags: hashtags.length > 0 ? hashtags : undefined,
-          mentions: mentions.length > 0 ? mentions : undefined
-        },
-        privacy,
-        scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined
-      };
+    const postData = {
+      content: {
+        text: text.trim() || undefined,
+        videoUrl: videoUrl.trim() || undefined,
+        hashtags: hashtags.length > 0 ? hashtags : undefined,
+        mentions: mentions.length > 0 ? mentions : undefined
+      },
+      privacy,
+      scheduledFor: scheduledFor ? new Date(scheduledFor) : undefined
+    };
 
-      // TODO: Call the create post API
-      console.log('Creating post:', postData);
+    try {
+      const result = await createPostMutation.mutateAsync(postData);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const postId = 'temp-post-id'; // This would come from the API
-      
-      onPostCreated?.(postId);
-      
-      // Reset form
-      setText('');
-      setVideoUrl('');
-      setPrivacy(PostPrivacy.PUBLIC);
-      setScheduledFor('');
-      setHashtags([]);
-      setMentions([]);
-      
+      if (result.success && result.post) {
+        onPostCreated?.(result.post.id || 'temp-id');
+        
+        // Reset form
+        setText('');
+        setVideoUrl('');
+        setPrivacy(PostPrivacy.PUBLIC);
+        setScheduledFor('');
+        setHashtags([]);
+        setMentions([]);
+      } else {
+        setError(result.error || 'Failed to create post');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create post');
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -326,7 +321,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({
             <Button
               variant="outline"
               onClick={onCancel}
-              disabled={isSubmitting}
+              disabled={createPostMutation.isPending}
             >
               Cancel
             </Button>
@@ -334,10 +329,10 @@ export const CreatePost: React.FC<CreatePostProps> = ({
           
           <Button
             onClick={handleSubmit}
-            disabled={isSubmitting || isOverLimit || (!text.trim() && !videoUrl.trim())}
+            disabled={createPostMutation.isPending || isOverLimit || (!text.trim() && !videoUrl.trim())}
             className="min-w-[100px]"
           >
-            {isSubmitting ? 'Creating...' : 'Post'}
+            {createPostMutation.isPending ? 'Creating...' : 'Post'}
           </Button>
         </div>
       </div>

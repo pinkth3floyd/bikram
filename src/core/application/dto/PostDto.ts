@@ -47,6 +47,12 @@ export interface PostResponseDto {
   currentUserReaction?: string;
 }
 
+export interface GetPostFeedDto {
+  page?: number;
+  limit?: number;
+  privacy?: PostPrivacy;
+}
+
 export interface PostFeedDto {
   posts: PostResponseDto[];
   total: number;
