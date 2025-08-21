@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../core/ui/elements/Card'
 import { Button } from '../core/ui/elements/Button'
 import { Input } from '../core/ui/elements/Input'
-import { Textarea } from '../core/ui/elements/TextArea'
+import { TextArea } from '../core/ui/elements/TextArea'
 import { Label } from '../core/ui/elements/Label'
 import MainNav from '@/app/core/ui/components/MainNav'
 import { 
@@ -279,7 +279,7 @@ const ContactPage = () => {
                       </div>
                       <div>
                         <Label htmlFor="message">Message</Label>
-                        <Textarea
+                        <TextArea
                           id="message"
                           name="message"
                           value={formData.message}

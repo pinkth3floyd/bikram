@@ -9,7 +9,10 @@
     "lint": "next lint",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
-    "db:studio": "drizzle-kit studio",
+    "db:studio": "tsx scripts/db-studio.ts",
+    "db:studio:original": "drizzle-kit studio",
+    "db:viewer": "tsx scripts/db-viewer.ts",
+    "db:manager": "tsx scripts/db-manager.ts",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
@@ -27,6 +30,7 @@
     "@tanstack/react-query": "^5.84.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",

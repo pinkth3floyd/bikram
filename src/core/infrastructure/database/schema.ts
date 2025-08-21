@@ -127,3 +127,131 @@ export const settingsIndexes = {
   userIdIdx: 'user_settings_user_id_idx',
   settingKeyIdx: 'user_settings_setting_key_idx',
 };
+
+// Posts table
+export const posts = sqliteTable('posts', {
+  id: text('id').primaryKey(),
+  authorId: text('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: text('type').notNull().default('text'), // text, video, mixed
+  privacy: text('privacy').notNull().default('public'), // public, private, friends
+  
+  // Content (stored as JSON)
+  content: text('content').notNull(), // JSON string
+  
+  // Statistics
+  likesCount: integer('likes_count').default(0),
+  commentsCount: integer('comments_count').default(0),
+  sharesCount: integer('shares_count').default(0),
+  viewsCount: integer('views_count').default(0),
+  engagementRate: real('engagement_rate').default(0),
+  
+  // Metadata (stored as JSON)
+  metadata: text('metadata'), // JSON string
+  
+  // Timestamps
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  publishedAt: integer('published_at', { mode: 'timestamp' }),
+  scheduledFor: integer('scheduled_for', { mode: 'timestamp' }),
+});
+
+// Comments table
+export const comments = sqliteTable('comments', {
+  id: text('id').primaryKey(),
+  postId: text('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
+  authorId: text('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  parentId: text('parent_id'), // for replies - will be handled in application logic
+  
+  // Content
+  content: text('content').notNull(), // JSON string
+  
+  // Status
+  status: text('status').notNull().default('active'), // active, deleted, hidden, moderated
+  
+  // Statistics
+  likesCount: integer('likes_count').default(0),
+  repliesCount: integer('replies_count').default(0),
+  reportsCount: integer('reports_count').default(0),
+  
+  // Metadata (stored as JSON)
+  metadata: text('metadata'), // JSON string
+  
+  // Timestamps
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Likes table
+export const likes = sqliteTable('likes', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  targetId: text('target_id').notNull(), // post ID or comment ID
+  targetType: text('target_type').notNull(), // post or comment
+  reaction: text('reaction').notNull().default('like'), // like, love, haha, wow, sad, angry, care
+  createdAt: integer('created_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Post views tracking
+export const postViews = sqliteTable('post_views', {
+  id: text('id').primaryKey(),
+  postId: text('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }), // null for anonymous views
+  ipAddress: text('ip_address'),
+  userAgent: text('user_agent'),
+  viewedAt: integer('viewed_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Post shares tracking
+export const postShares = sqliteTable('post_shares', {
+  id: text('id').primaryKey(),
+  postId: text('post_id').notNull().references(() => posts.id, { onDelete: 'cascade' }),
+  userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  shareType: text('share_type').notNull(), // copy_link, repost, external
+  sharedAt: integer('shared_at', { mode: 'timestamp' }).default(sql`CURRENT_TIMESTAMP`),
+});
+
+// Indexes for posts
+export const postsIndexes = {
+  authorIdx: 'posts_author_id_idx',
+  typeIdx: 'posts_type_idx',
+  privacyIdx: 'posts_privacy_idx',
+  createdAtIdx: 'posts_created_at_idx',
+  publishedAtIdx: 'posts_published_at_idx',
+  scheduledForIdx: 'posts_scheduled_for_idx',
+  likesCountIdx: 'posts_likes_count_idx',
+  commentsCountIdx: 'posts_comments_count_idx',
+  viewsCountIdx: 'posts_views_count_idx',
+};
+
+// Indexes for comments
+export const commentsIndexes = {
+  postIdx: 'comments_post_id_idx',
+  authorIdx: 'comments_author_id_idx',
+  parentIdx: 'comments_parent_id_idx',
+  statusIdx: 'comments_status_idx',
+  createdAtIdx: 'comments_created_at_idx',
+  likesCountIdx: 'comments_likes_count_idx',
+};
+
+// Indexes for likes
+export const likesIndexes = {
+  userIdx: 'likes_user_id_idx',
+  targetIdx: 'likes_target_id_idx',
+  targetTypeIdx: 'likes_target_type_idx',
+  reactionIdx: 'likes_reaction_idx',
+  createdAtIdx: 'likes_created_at_idx',
+};
+
+// Indexes for post views
+export const postViewsIndexes = {
+  postIdx: 'post_views_post_id_idx',
+  userIdx: 'post_views_user_id_idx',
+  viewedAtIdx: 'post_views_viewed_at_idx',
+};
+
+// Indexes for post shares
+export const postSharesIndexes = {
+  postIdx: 'post_shares_post_id_idx',
+  userIdx: 'post_shares_user_id_idx',
+  sharedAtIdx: 'post_shares_shared_at_idx',
+};
