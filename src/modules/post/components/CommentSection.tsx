@@ -140,7 +140,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                 placeholder="Write a comment..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="min-h-[80px] resize-none"
+                className="min-h-[80px] resize-none text-black"
                 maxLength={2000}
               />
               <div className="flex items-center justify-between">
@@ -151,7 +151,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
                   onClick={handleSubmitComment}
                   disabled={!newComment.trim() || submitting}
                   size="sm"
-                  className="flex items-center space-x-2"
+                  className="flex items-center space-x-2 text-black bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
                 >
                   {submitting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
