@@ -1,4 +1,4 @@
-import { eq, and, desc, count, or } from 'drizzle-orm';
+import { eq, and, desc, count } from 'drizzle-orm';
 import { LikeRepository } from '../../../domain/repositories/LikeRepository';
 import { Like, LikeType, LikeReaction } from '../../../domain/entities/Like';
 import { db, dbReadonly } from '../connection';
@@ -182,25 +182,6 @@ export class LikeRepositoryImpl implements LikeRepository {
     }
   }
 
-  async getLikesByReaction(targetId: string, targetType: LikeType, reaction: LikeReaction): Promise<number> {
-    try {
-      const result = await this.readonlyDatabase
-        .select({ count: count() })
-        .from(likes)
-        .where(
-          and(
-            eq(likes.targetId, targetId),
-            eq(likes.targetType, targetType),
-            eq(likes.reaction, reaction)
-          )
-        );
-
-      return result[0]?.count || 0;
-    } catch (error) {
-      console.error('Error getting likes by reaction:', error);
-      throw new Error('Failed to get likes by reaction');
-    }
-  }
 
   async getReactionCounts(targetId: string, targetType: LikeType): Promise<Record<LikeReaction, number>> {
     try {
@@ -292,6 +273,172 @@ export class LikeRepositoryImpl implements LikeRepository {
     } catch (error) {
       console.error('Error deleting likes by target:', error);
       throw new Error('Failed to delete likes by target');
+    }
+  }
+
+  async getLikesByType(): Promise<Record<LikeType, number>> {
+    try {
+      const postLikes = await this.database
+        .select({ count: count() })
+        .from(likes)
+        .where(eq(likes.targetType, LikeType.POST));
+
+      const commentLikes = await this.database
+        .select({ count: count() })
+        .from(likes)
+        .where(eq(likes.targetType, LikeType.COMMENT));
+
+      return {
+        [LikeType.POST]: postLikes[0]?.count || 0,
+        [LikeType.COMMENT]: commentLikes[0]?.count || 0
+      };
+    } catch (error) {
+      console.error('Error getting likes by type:', error);
+      throw new Error('Failed to get likes by type');
+    }
+  }
+
+  async getLikesByReaction(): Promise<Record<LikeReaction, number>> {
+    try {
+      const reactions = Object.values(LikeReaction);
+      const result: Record<LikeReaction, number> = {} as Record<LikeReaction, number>;
+
+      for (const reaction of reactions) {
+        const countResult = await this.database
+          .select({ count: count() })
+          .from(likes)
+          .where(eq(likes.reaction, reaction));
+        
+        result[reaction] = countResult[0]?.count || 0;
+      }
+
+      return result;
+    } catch (error) {
+      console.error('Error getting likes by reaction:', error);
+      throw new Error('Failed to get likes by reaction');
+    }
+  }
+
+  async getLikeCountForTarget(targetId: string, targetType: LikeType): Promise<number> {
+    try {
+      return await this.getLikesByTarget(targetId, targetType);
+    } catch (error) {
+      console.error('Error getting like count for target:', error);
+      throw new Error('Failed to get like count for target');
+    }
+  }
+
+  async getReactionCountForTarget(targetId: string, targetType: LikeType): Promise<Record<LikeReaction, number>> {
+    try {
+      return await this.getReactionCounts(targetId, targetType);
+    } catch (error) {
+      console.error('Error getting reaction count for target:', error);
+      throw new Error('Failed to get reaction count for target');
+    }
+  }
+
+  async getUserLikes(userId: string): Promise<Like[]> {
+    try {
+      return await this.findByUser(userId);
+    } catch (error) {
+      console.error('Error getting user likes:', error);
+      throw new Error('Failed to get user likes');
+    }
+  }
+
+  async getUserLikesByType(userId: string, targetType: LikeType): Promise<Like[]> {
+    try {
+      const result = await this.readonlyDatabase
+        .select()
+        .from(likes)
+        .where(
+          and(
+            eq(likes.userId, userId),
+            eq(likes.targetType, targetType)
+          )
+        )
+        .orderBy(desc(likes.createdAt));
+
+      return result.map(row => this.mapToLike(row));
+    } catch (error) {
+      console.error('Error getting user likes by type:', error);
+      throw new Error('Failed to get user likes by type');
+    }
+  }
+
+  async getUserLikesByReaction(userId: string, reaction: LikeReaction): Promise<Like[]> {
+    try {
+      const result = await this.readonlyDatabase
+        .select()
+        .from(likes)
+        .where(
+          and(
+            eq(likes.userId, userId),
+            eq(likes.reaction, reaction)
+          )
+        )
+        .orderBy(desc(likes.createdAt));
+
+      return result.map(row => this.mapToLike(row));
+    } catch (error) {
+      console.error('Error getting user likes by reaction:', error);
+      throw new Error('Failed to get user likes by reaction');
+    }
+  }
+
+  async deleteMany(ids: string[]): Promise<void> {
+    try {
+      for (const id of ids) {
+        await this.delete(id);
+      }
+    } catch (error) {
+      console.error('Error deleting many likes:', error);
+      throw new Error('Failed to delete many likes');
+    }
+  }
+
+  async getMostLikedTargets(targetType: LikeType, limit: number): Promise<Array<{ targetId: string; count: number }>> {
+    try {
+      const result = await this.readonlyDatabase
+        .select({
+          targetId: likes.targetId,
+          count: count()
+        })
+        .from(likes)
+        .where(eq(likes.targetType, targetType))
+        .groupBy(likes.targetId)
+        .orderBy(desc(count()))
+        .limit(limit);
+
+      return result.map(row => ({
+        targetId: row.targetId,
+        count: row.count
+      }));
+    } catch (error) {
+      console.error('Error getting most liked targets:', error);
+      throw new Error('Failed to get most liked targets');
+    }
+  }
+
+  async getMostReactiveUsers(limit: number): Promise<Array<{ userId: string; count: number }>> {
+    try {
+      const result = await this.readonlyDatabase
+        .select({
+          userId: likes.userId,
+          count: count()
+        })
+        .from(likes)
+        .groupBy(likes.userId)
+        .orderBy(desc(count()))
+        .limit(limit);
+
+      return result.map(row => ({
+        userId: row.userId,
+        count: row.count
+      }));
+    } catch (error) {
+      console.error('Error getting most reactive users:', error);
+      throw new Error('Failed to get most reactive users');
     }
   }
 

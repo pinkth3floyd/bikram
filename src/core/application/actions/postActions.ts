@@ -197,10 +197,7 @@ export async function likePost(postId: string, reaction: LikeReaction = LikeReac
     // Revalidate the home page
     revalidatePath('/home');
     
-    return {
-      success: true,
-      ...result
-    };
+    return result;
 
   } catch (error) {
     console.error('Error liking post:', error);

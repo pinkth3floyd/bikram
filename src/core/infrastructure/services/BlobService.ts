@@ -1,4 +1,4 @@
-import { put, del, list, PutBlobResult, ListBlobResultBlob } from '@vercel/blob';
+import { put, del, list, ListBlobResultBlob } from '@vercel/blob';
 import { Readable } from 'stream';
 
 export interface UploadResult {

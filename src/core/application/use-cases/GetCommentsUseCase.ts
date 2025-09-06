@@ -19,7 +19,7 @@ export class GetCommentsUseCase {
     this.validateInput(page, limit);
 
     // Get comments from repository
-    const result = await this.commentRepository.findWithPagination(postId, page, limit);
+    const result = await this.commentRepository.findByPostWithPagination(postId, page, limit);
 
     // Convert to DTOs
     const comments = await Promise.all(

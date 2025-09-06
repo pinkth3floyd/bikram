@@ -34,6 +34,12 @@ export interface CommentRepository {
     page: number;
     totalPages: number;
   }>;
+  findByPostWithPagination(postId: string, page: number, limit: number): Promise<{
+    comments: Comment[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>;
   
   // Bulk operations
   updateMany(ids: string[], updates: Partial<Comment>): Promise<void>;

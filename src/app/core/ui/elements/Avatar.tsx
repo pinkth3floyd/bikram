@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { cn } from './ClassnameUtil';
 
 interface AvatarProps {
@@ -31,9 +32,11 @@ export const Avatar: React.FC<AvatarProps> = ({
 
   if (src && !imageError) {
     return (
-      <img
+      <Image
         src={src}
         alt={alt || 'Avatar'}
+        width={size === 'sm' ? 32 : size === 'md' ? 40 : size === 'lg' ? 48 : 64}
+        height={size === 'sm' ? 32 : size === 'md' ? 40 : size === 'lg' ? 48 : 64}
         className={cn(
           'rounded-full object-cover',
           sizeClasses[size],

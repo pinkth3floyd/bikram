@@ -55,7 +55,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({
     }
   };
 
-  const handlePostCreated = (postId: string) => {
+  const handlePostCreated = (_postId: string) => {
     setShowCreatePostForm(false);
     // Refresh the feed to show the new post
     handleRefresh();

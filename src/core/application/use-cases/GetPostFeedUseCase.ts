@@ -40,7 +40,7 @@ export class GetPostFeedUseCase {
     }
   }
 
-  private async convertToResponseDto(post: Post, currentUserId?: string): Promise<PostResponseDto> {
+  private async convertToResponseDto(post: Post, _currentUserId?: string): Promise<PostResponseDto> {
     const content = post.getContent();
     const stats = post.getStats();
     const metadata = post.getMetadata();

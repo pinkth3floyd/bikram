@@ -7,7 +7,6 @@ import { Card } from '@/app/core/ui/elements/Card';
 import { Avatar } from '@/app/core/ui/elements/Avatar';
 import { 
   Heart, 
-  MessageCircle, 
   MoreHorizontal,
   Reply,
   Edit,
@@ -46,15 +45,16 @@ export const CommentCard: React.FC<CommentCardProps> = ({
     comment.currentUserReaction as LikeReaction
   );
 
-  const reactions: Array<{ type: LikeReaction; emoji: string; label: string }> = [
-    { type: LikeReaction.LIKE, emoji: '👍', label: 'Like' },
-    { type: LikeReaction.LOVE, emoji: '❤️', label: 'Love' },
-    { type: LikeReaction.HAHA, emoji: '😂', label: 'Haha' },
-    { type: LikeReaction.WOW, emoji: '😮', label: 'Wow' },
-    { type: LikeReaction.SAD, emoji: '😢', label: 'Sad' },
-    { type: LikeReaction.ANGRY, emoji: '😠', label: 'Angry' },
-    { type: LikeReaction.CARE, emoji: '🤗', label: 'Care' }
-  ];
+  // TODO: Implement reaction picker for comments
+  // const reactions: Array<{ type: LikeReaction; emoji: string; label: string }> = [
+  //   { type: LikeReaction.LIKE, emoji: '👍', label: 'Like' },
+  //   { type: LikeReaction.LOVE, emoji: '❤️', label: 'Love' },
+  //   { type: LikeReaction.HAHA, emoji: '😂', label: 'Haha' },
+  //   { type: LikeReaction.WOW, emoji: '😮', label: 'Wow' },
+  //   { type: LikeReaction.SAD, emoji: '😢', label: 'Sad' },
+  //   { type: LikeReaction.ANGRY, emoji: '😠', label: 'Angry' },
+  //   { type: LikeReaction.CARE, emoji: '🤗', label: 'Care' }
+  // ];
 
   const isAuthor = user?.id === comment.authorId;
   const canEdit = isAuthor && comment.status === 'active';

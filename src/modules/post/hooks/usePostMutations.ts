@@ -38,7 +38,7 @@ export function useLikePost() {
         // Optimistically update the UI
         queryClient.invalidateQueries({ queryKey: ['posts'] });
       } else {
-        toast.error(data.error || 'Failed to like post');
+        toast.error('error' in data ? data.error : 'Failed to like post');
       }
     },
     onError: (error) => {

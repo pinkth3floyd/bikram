@@ -33,7 +33,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({
   // Load comments on mount
   useEffect(() => {
     loadComments();
-  }, [postId]);
+  }, [postId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadComments = async () => {
     try {
