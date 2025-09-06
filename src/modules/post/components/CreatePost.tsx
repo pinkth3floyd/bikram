@@ -213,13 +213,13 @@ export const CreatePost: React.FC<CreatePostProps> = ({
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Create Post</h3>
+          <h3 className="text-lg font-semibold text-black">Create Post</h3>
           {onCancel && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onCancel}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 hover:text-gray-700 text-black"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -240,7 +240,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({
             placeholder="What's on your mind?"
             value={text}
             onChange={(e) => handleTextChange(e.target.value)}
-            className="min-h-[120px] resize-none"
+            className="min-h-[120px] resize-none text-black"
             maxLength={maxCharacters}
           />
           
@@ -393,7 +393,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({
                   {privacyOptions.map((option) => {
                     const Icon = option.icon;
                     return (
-                      <option key={option.value} value={option.value}>
+                      <option key={option.value} value={option.value} className='text-black'>
                         <Icon className="h-4 w-4 mr-2" />
                         {option.label}
                       </option>
@@ -434,7 +434,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({
           <Button
             onClick={handleSubmit}
             disabled={createPostMutation.isPending || isOverLimit || (!text.trim() && !videoUrl.trim())}
-            className="min-w-[100px]"
+            className="min-w-[100px] text-black bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
           >
             {createPostMutation.isPending ? 'Creating...' : 'Post'}
           </Button>

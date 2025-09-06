@@ -70,6 +70,7 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <div className='flex flex-col items-center justify-center gap-4'>
       <MainNav />
       
       <div className="container mx-auto px-4 py-8">
@@ -133,6 +134,7 @@ const HomePage = () => {
             showCreatePost={false} // We're handling this separately now
           />
         </div>
+      </div>
       </div>
     </div>
   )
