@@ -6,7 +6,9 @@ import { CreatePostUseCase } from '../use-cases/CreatePostUseCase';
 import { GetPostFeedUseCase } from '../use-cases/GetPostFeedUseCase';
 import { UpdatePostUseCase } from '../use-cases/UpdatePostUseCase';
 import { DeletePostUseCase } from '../use-cases/DeletePostUseCase';
+import { LikePostUseCase } from '../use-cases/LikePostUseCase';
 import { CreatePostDto, GetPostFeedDto, UpdatePostDto } from '../dto/PostDto';
+import { LikeReaction } from '../../domain/entities/Like';
 import { initDatabase, getDatabaseService } from '@/core/infrastructure/database/init';
 import { blobService } from '@/core/infrastructure/services/BlobService';
 import { ensureUserExists } from './userActions';
@@ -113,6 +115,7 @@ export async function getPostFeed(data: GetPostFeedDto) {
     await initDatabase();
     const databaseService = getDatabaseService();
     const postRepository = databaseService.getPostRepository();
+    const userRepository = databaseService.getUserRepository();
 
     // Ensure user exists in our database
     const userResult = await ensureUserExists(userId);
@@ -131,7 +134,7 @@ export async function getPostFeed(data: GetPostFeedDto) {
     }
     
     // Create get post feed use case
-    const getPostFeedUseCase = new GetPostFeedUseCase(postRepository);
+    const getPostFeedUseCase = new GetPostFeedUseCase(postRepository, userRepository);
     
     // Execute the use case
     const result = await getPostFeedUseCase.execute(
@@ -161,7 +164,7 @@ export async function getPostFeed(data: GetPostFeedDto) {
   }
 }
 
-export async function likePost(postId: string, reaction: string = 'like') {
+export async function likePost(postId: string, reaction: LikeReaction = LikeReaction.LIKE) {
   try {
     // Get user from Clerk
     const { userId } = await auth();
@@ -172,16 +175,31 @@ export async function likePost(postId: string, reaction: string = 'like') {
 
     // Initialize database
     await initDatabase();
+    const databaseService = getDatabaseService();
+    const likeRepository = databaseService.getLikeRepository();
+    const postRepository = databaseService.getPostRepository();
+
+    // Ensure user exists in our database
+    const userResult = await ensureUserExists(userId);
+    if (!userResult.success) {
+      return {
+        success: false,
+        error: userResult.error || 'Failed to ensure user exists'
+      };
+    }
     
-    // TODO: Implement like post use case
-    // For now, just return success
-    console.log(`User ${userId} liked post ${postId} with reaction ${reaction}`);
+    // Create like post use case
+    const likePostUseCase = new LikePostUseCase(likeRepository, postRepository);
+    
+    // Execute the use case
+    const result = await likePostUseCase.execute(userId, postId, reaction);
 
     // Revalidate the home page
     revalidatePath('/home');
     
     return {
-      success: true
+      success: true,
+      ...result
     };
 
   } catch (error) {

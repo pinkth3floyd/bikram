@@ -1,17 +1,25 @@
 import { getDatabaseStatus, healthCheck } from './connection';
 import { UserRepositoryImpl } from './repositories/UserRepositoryImpl';
 import { PostRepositoryImpl } from './repositories/PostRepositoryImpl';
+import { CommentRepositoryImpl } from './repositories/CommentRepositoryImpl';
+import { LikeRepositoryImpl } from './repositories/LikeRepositoryImpl';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { PostRepository } from '../../domain/repositories/PostRepository';
+import { CommentRepository } from '../../domain/repositories/CommentRepository';
+import { LikeRepository } from '../../domain/repositories/LikeRepository';
 
 export class DatabaseService {
   private static instance: DatabaseService;
   private userRepository: UserRepository;
   private postRepository: PostRepository;
+  private commentRepository: CommentRepository;
+  private likeRepository: LikeRepository;
 
   private constructor() {
     this.userRepository = new UserRepositoryImpl();
     this.postRepository = new PostRepositoryImpl();
+    this.commentRepository = new CommentRepositoryImpl();
+    this.likeRepository = new LikeRepositoryImpl();
   }
 
   public static getInstance(): DatabaseService {
@@ -28,6 +36,14 @@ export class DatabaseService {
 
   public getPostRepository(): PostRepository {
     return this.postRepository;
+  }
+
+  public getCommentRepository(): CommentRepository {
+    return this.commentRepository;
+  }
+
+  public getLikeRepository(): LikeRepository {
+    return this.likeRepository;
   }
 
   // Database health and status

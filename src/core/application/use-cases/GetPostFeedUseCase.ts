@@ -1,9 +1,13 @@
 import { Post } from '../../domain/entities/Post';
 import { PostRepository } from '../../domain/repositories/PostRepository';
+import { UserRepository } from '../../domain/repositories/UserRepository';
 import { PostFeedDto, PostResponseDto } from '../dto/PostDto';
 
 export class GetPostFeedUseCase {
-  constructor(private postRepository: PostRepository) {}
+  constructor(
+    private postRepository: PostRepository,
+    private userRepository: UserRepository
+  ) {}
 
   async execute(userId: string, page: number = 1, limit: number = 20): Promise<PostFeedDto> {
     // Validate input
@@ -14,7 +18,7 @@ export class GetPostFeedUseCase {
 
     // Convert to DTOs
     const posts = await Promise.all(
-      result.posts.map(post => this.convertToResponseDto(post))
+      result.posts.map(post => this.convertToResponseDto(post, userId))
     );
 
     return {
@@ -36,19 +40,23 @@ export class GetPostFeedUseCase {
     }
   }
 
-  private async convertToResponseDto(post: Post): Promise<PostResponseDto> {
+  private async convertToResponseDto(post: Post, currentUserId?: string): Promise<PostResponseDto> {
     const content = post.getContent();
     const stats = post.getStats();
     const metadata = post.getMetadata();
+
+    // Fetch author information
+    const author = await this.userRepository.findById(post.getAuthorId());
+    const authorProfile = author?.getProfile();
 
     return {
       id: post.getId(),
       authorId: post.getAuthorId(),
       author: {
         id: post.getAuthorId(),
-        displayName: 'User', // This would be fetched from user repository
-        username: 'username', // This would be fetched from user repository
-        avatar: undefined // This would be fetched from user repository
+        displayName: authorProfile?.displayName || 'Unknown User',
+        username: author?.getUsername() || 'unknown',
+        avatar: authorProfile?.avatar
       },
       content,
       type: post.getType(),

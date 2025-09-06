@@ -22,6 +22,7 @@ import {
 import { PostResponseDto } from '@/core/application/dto/PostDto';
 import { LikeReaction } from '@/core/domain/entities/Like';
 import { formatDistanceToNow } from 'date-fns';
+import { CommentSection } from './CommentSection';
 
 interface PostCardProps {
   post: PostResponseDto;
@@ -47,6 +48,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   const { user } = useUser();
   const [showReactions, setShowReactions] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
+  const [showComments, setShowComments] = useState(false);
   const [isLiked, setIsLiked] = useState(post.isLikedByCurrentUser || false);
   const [currentReaction, setCurrentReaction] = useState<LikeReaction | undefined>(
     post.currentUserReaction as LikeReaction
@@ -84,6 +86,7 @@ export const PostCard: React.FC<PostCardProps> = ({
   };
 
   const handleComment = () => {
+    setShowComments(!showComments);
     onComment?.(post.id);
   };
 
@@ -350,7 +353,9 @@ export const PostCard: React.FC<PostCardProps> = ({
               variant="ghost"
               size="sm"
               onClick={handleComment}
-              className="flex items-center space-x-1 text-gray-500 hover:text-gray-700"
+              className={`flex items-center space-x-1 ${
+                showComments ? 'text-blue-500' : 'text-gray-500 hover:text-gray-700'
+              }`}
             >
               <MessageCircle className="h-4 w-4" />
               <span>Comment</span>
@@ -368,6 +373,19 @@ export const PostCard: React.FC<PostCardProps> = ({
             </Button>
           </div>
         </div>
+
+        {/* Comments Section */}
+        {showComments && (
+          <div className="pt-4 border-t">
+            <CommentSection
+              postId={post.id}
+              onCommentAdded={() => {
+                // Refresh post stats or handle comment added
+                console.log('Comment added to post:', post.id);
+              }}
+            />
+          </div>
+        )}
       </div>
     </Card>
   );

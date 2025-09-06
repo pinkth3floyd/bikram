@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { createPost, likePost, unlikePost, deletePost, updatePost } from '@/core/application/actions/postActions';
 import { CreatePostDto, UpdatePostDto } from '@/core/application/dto/PostDto';
+import { LikeReaction } from '@/core/domain/entities/Like';
 import { toast } from 'sonner';
 
 export function useCreatePost() {
@@ -30,7 +31,7 @@ export function useLikePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, reaction }: { postId: string; reaction?: string }) => 
+    mutationFn: ({ postId, reaction }: { postId: string; reaction?: LikeReaction }) => 
       likePost(postId, reaction),
     onSuccess: (data) => {
       if (data.success) {
